@@ -83,7 +83,7 @@ http://vimcasts.org/episodes/ultisnips-visual-placeholder/
 
 该插件在python 2.7，3.3，3.4版本下经过测试，不保证其他版本正常工作
 
-Python 2.x 或者 Python 3.x 的接口必须是可用的。也就是说，vim编译的时候比如加入
+Python 2.x 或者 Python 3.x 的接口必须是可用的。也就是说，vim编译的时候必须加入
 了|+python| 或 |+python3| 特性。下面的命令展示了如何测试你的vim编译时是否加入了这些
 特性。如有有相应的特性，就会输出1，否则输出0。
 
@@ -779,7 +779,7 @@ python脚本可以通过使用 shebang 行'#!/usr/bin/python'来运行，但是�
    path    - 当前文件的完整路径
    t       - 占位符的值，t[1] 就是 ${1} 表示的文本，以此类推
    snip    - UltiSnips.TextObjects.SnippetUtil 对象的实例。有一些简化插入处理的
-	     方法
+             方法
    context - 上下文条件的结果。 参见 |UltiSnips-context-snippets|
 
 'snip' 对象提供了下列方法： >
@@ -787,16 +787,16 @@ python脚本可以通过使用 shebang 行'#!/usr/bin/python'来运行，但是�
     snip.mkline(line="", indent=None):
         is None, then mkline prepends spaces and/or tabs appropriate to the
         current 'tabstop' and 'expandtab' variables.
-	返回一行将要添加到结果中的文本。如果indent参数为None，该函数会根据当前
-	的 'tabstop' 和 'expandtab' 设置来添加 空格和/或制表符的缩进。
+        返回一行将要添加到结果中的文本。如果indent参数为None，该函数会根据当前
+        的 'tabstop' 和 'expandtab' 设置来添加 空格和/或制表符的缩进。
 
     snip.shift(amount=1):
-	根据 'shiftwidth' 定义和空格数，'amount' times 来转换 mkline 使用的缩进
-	级别。
+        根据 'shiftwidth' 定义和空格数，'amount' times 来转换 mkline 使用的缩进
+        级别。
 
     snip.unshift(amount=1):
         根据 'shiftwidth' 设置的空格数目，'amount' times，转换mkline使用的默认的
-	缩进级别
+        缩进级别
 
     snip.reset_indent():
         重置内置的缩进级别为其初始值。
@@ -1056,19 +1056,16 @@ a<tab>http://www.google.com<c-j><BS><c-j>Google ->
 4.6 镜像                                                  *UltiSnips-mirrors*
 --------
 
-Mirrors repeat the content of a tabstop. During snippet expansion when you
-enter the value for a tabstop, all mirrors of that tabstop are replaced with
-the same value. To mirror a tabstop simply insert the tabstop again using the
-"dollar sign followed by a number" syntax, e.g., '$1'.
+镜像可以重复一个插入点的内容。在一个片段展开后，当你在一个插入点插入内容，该插入
+点的所有的镜像都会被同样的值替换。要给一个插入点做一个镜像，只需要简单的再插入
+这个插入点一次，使用 $ 符号并跟上一个数字的语法，例如，'$1'
 
-A tabstop can be mirrored multiple times in one snippet, and more than one
-tabstop can be mirrored in the same snippet. A mirrored tabstop can have a
-default value defined. Only the first instance of the tabstop need have a
-default value. Mirrored tabstop will take on the default value automatically.
+在一个片段中，一个插入点可以被镜像多次，而且一个片段中可以有多插入点存在镜像。一
+个插入点的镜像可以有一个默认值。只需要第一个插入点有默认值，镜像插入点会自动拥有
+这个默认值。
 
-Mirrors are handy for start-end tags, for example, TeX 'begin' and 'end' tag
-labels, XML and HTML tags, and C code #ifndef blocks. Here are some snippet
-examples.
+镜像方便于使用开始结束标签，例如，Tex的 'begin' 和 'end' 标签，XML 和 HTML 的标
+签，还有C的 #ifndef 代码块。这里有一些片段的例子。
 
 ------------------- SNIP -------------------
 snippet env
@@ -1250,7 +1247,7 @@ clearsnippets
 
 priority -1
 snippet example "Cleared example"
-	This will never be expanded.
+        This will never be expanded.
 endsnippet
 ------------------- SNAP -------------------
 
@@ -1454,7 +1451,7 @@ new method definition for it:
 pre_expand "del snip.buffer[snip.line]; snip.buffer.append(''); snip.cursor.set(len(snip.buffer)-1, 0)"
 snippet x
 def $1():
-	${2:${VISUAL}}
+        ${2:${VISUAL}}
 endsnippet
 ------------------- SNAP -------------------
 
@@ -1489,7 +1486,7 @@ function that will insert as many newlines as required in specific context.
 post_expand "snip.buffer[snip.snippet_end[0]+1:snip.snippet_end[0]+1] = ['']"
 snippet d "Description" b
 def $1():
-	$2
+        $2
 endsnippet
 ------------------- SNAP -------------------
 
@@ -1547,14 +1544,14 @@ out of method declaration snippet.
 ------------------- SNIP -------------------
 global !p
 def insert_method_call(name):
-	vim.command('normal G')
-	snip.expand_anon(name + '($1)\n')
+        vim.command('normal G')
+        snip.expand_anon(name + '($1)\n')
 endglobal
 
 post_jump "if snip.tabstop == 0: insert_method_call(snip.tabstops[1].current_text)"
 snippet d "method declaration" b
 def $1():
-	$2
+        $2
 endsnippet
 ------------------- SNAP -------------------
 
@@ -1584,7 +1581,7 @@ endsnippet
 
 snippet "^m" "func main" rbA
 func main() {
-	$1
+        $1
 }
 endsnippet
 ------------------- SNAP -------------------
