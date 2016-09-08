@@ -33,9 +33,9 @@ UltiSnips                                      *snippet* *snippets* *UltiSnips*
       4.4.4 全局的snippets(片段)                |UltiSnips-globals|
    4.5 Tabstops and Placeholders                |UltiSnips-tabstops|
    4.6 镜像                                     |UltiSnips-mirrors|
-   4.7 Transformations                          |UltiSnips-transformations|
-      4.7.1 Replacement String                  |UltiSnips-replacement-string|
-      4.7.2 Demos                               |UltiSnips-demos|
+   4.7 转换                                     |UltiSnips-transformations|
+      4.7.1 替换字符串                          |UltiSnips-replacement-string|
+      4.7.2 演示                                |UltiSnips-demos|
    4.8 Clearing snippets                        |UltiSnips-clearing-snippets|
    4.9 Context snippets                         |UltiSnips-context-snippets|
    4.10 Snippet actions                         |UltiSnips-snippet-actions|
@@ -1094,79 +1094,72 @@ ifndef<tab>WIN32 ->
 #endif /* WIN32 */
 
 
-4.7 Transformations                               *UltiSnips-transformations*
--------------------
+4.7 转换                                          *UltiSnips-transformations*
+--------
 
-Note: Transformations are a bit difficult to grasp so this chapter is divided
-into two sections. The first describes transformations and their syntax, and
-the second illustrates transformations with demos.
+Note: 转换有一些难以理解，所以这章被分成了两部分。第一部分描述转换及其与法，第二
+部分用一些演示说明了转换。
 
-Transformations are like mirrors but instead of just copying text from the
-original tabstop verbatim, a regular expression is matched to the content of
-the referenced tabstop and a transformation is then applied to the matched
-pattern. The syntax and functionality of transformations in UltiSnips follow
-very closely to TextMate transformations.
+转换就像镜像一样，但又不是仅仅从原位置逐字复制，一个正则表达式将匹配一个插入点的
+内容，然后一个转换被应用到匹配的部分。UltiSnips中的转换功能和它的语法和TextMate
+的转换特别相似。
 
-A transformation has the following syntax: >
+一个转换的语法大致如下: >
    ${<tab_stop_no/regular_expression/replacement/options}
 
-The components are defined as follows: >
-   tab_stop_no        - The number of the tabstop to reference
-   regular_expression - The regular expression the value of the referenced
-                        tabstop is matched on
-   replacement        - The replacement string, explained in detail below
-   options            - Options for the regular expression
+各个部分的定义如下: >
+   tab_stop_no        - 要引用的插入点的编号
+   regular_expression - 引用的插入点中和正则表达式匹配的内容
+   replacement        - 替换字符串，下面详细说明
+   options            - 正则表达式的选项
 
-The options can be any combination of >
-   g    - global replace
-          By default, only the first match of the regular expression is
-          replaced. With this option all matches are replaced.
-   i    - case insensitive
-          By default, regular expression matching is case sensitive. With this
-          option, matching is done without regard to case.
-   m    - multiline
+选项可以是下面几个字符的任何组合: >
+   g    - 全局替换
+          默认情况下，只有第一个匹配正则表达式的部分会被替换。使用这个选项，所有
+          匹配的内容都会被替换。
+   i    - 不区分大小写
+          默认情况下，正则表达式匹配是大小写敏感的。使用这个选项，正则表达式的
+          匹配将在忽略大小写的情况下完成。
+   m    - 多行模式
+          默认情况下，'^'和'$'特殊字符仅引用于这个字符串的开始和结束。所以如果你
+          选择了多行模式，转换将是把他们作为一个完整的单行字符串处理。使用这个选
+          项，'^'和'$'特殊字符匹配一个字符串中的任何行的开始和结束(使
+          换行符分隔 - '\n')
           By default, the '^' and '$' special characters only apply to the
           start and end of the entire string; so if you select multiple lines,
           transformations are made on them entirely as a whole single line
           string. With this option, '^' and '$' special characters match the
           start or end of any line within a string ( separated by newline
           character - '\n' ).
-   a    - ascii conversion
-          By default, transformation are made on the raw utf-8 string. With
-          this option, matching is done on the corresponding ASCII string
-          instead, for example 'à' will become 'a'.
-          This option required the python package 'unidecode'.
+   a    - ascii 转换
+          默认情况下，转换在原始的utf-8编码下工作。使用这个选项，匹配将会在相应
+          的 ASCII 字符中完成，例如，'à' 将会变成 'a'，这个选项需要python模块
+          'unidecode'的支持
 
-The syntax of regular expressions is beyond the scope of this document. Python
-regular expressions are used internally, so the python 're' module can be used
-as a guide. See http://docs.python.org/library/re.html.
+正则表达式的语法已经超出了本文档的范围。内部使用的是python正则表达式，所以 're'
+模块可以作为一个指导，查看http://docs.python.org/library/re.html。
 
-The syntax for the replacement string is unique. The next paragraph describes
-it in detail.
+替换字符的语法是唯一的。下一段将描述它的细节。
 
+ 4.7.1 替换字符串:                             *UltiSnips-replacement-string*
 
- 4.7.1 Replacement String:                     *UltiSnips-replacement-string*
-
-The replacement string can contain $no variables, e.g., $1, which reference
-matched groups in the regular expression. The $0 variable is special and
-yields the whole match. The replacement string can also contain special escape
-sequences: >
-   \u   - Uppercase next letter
-   \l   - Lowercase next letter
-   \U   - Uppercase everything till the next \E
-   \L   - Lowercase everything till the next \E
+替换字符串可以包含 $编号 的变量，例如，$1，表示正则表达式中的(匹配)组。$0 变量
+是特殊的用来产生整个匹配。替换字符串也可以包括特殊的转义序列： >
+   \u   - 大写下一个字符
+   \l   - 小写下一个字符
+   \U   - 大写所有 \E 之前的字符
+   \L   - 小写所有 \E 值钱的字符
    \E   - End upper or lowercase started with \L or \U
-   \n   - A newline
-   \t   - A literal tab
+   \n   - 一个新行
+   \t   - 一个换行符
 
-Finally, the replacement string can contain conditional replacements using the
-syntax (?no:text:other text). This reads as follows: if the group $no has
-matched, insert "text", otherwise insert "other text". "other text" is
-optional and if not provided defaults to the empty string, "". This feature
-is very powerful. It allows you to add optional text into snippets.
+最终，替换字符串可以包含有条件的替换，通过使用这样的语法(?no:text:other text)。
+它的意思是，如果组 $编号 不匹配，就插入 "text"，否则插入"other text"。"other text"
+是可选的，而且如果没有提供默认值就是空字符串，""。这个特性很强大。它允许你添加可
+选的文本到片段中。
 
 
- 4.7.2 Demos:                                               *UltiSnips-demos*
+ 4.7.2 演示:                                               *UltiSnips-demos*
 
 Transformations are very powerful but often the syntax is convoluted.
 Hopefully the demos below help illustrate transformation features.
