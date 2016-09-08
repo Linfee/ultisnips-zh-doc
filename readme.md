@@ -23,6 +23,8 @@ __注意__: 这仅仅只UltiSnips的文档的翻译，到[这里](https://github
 
     Plugin 'Linfee/ultisnips-zh-doc'
 
+__注意:__你需要先加载 ultisnips-zh-doc 再加载 UltiSnips 才能保证打开中文文档。
+
 ---
 
 UltiSnips简介
