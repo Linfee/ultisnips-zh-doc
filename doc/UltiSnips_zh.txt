@@ -1,0 +1,1734 @@
+*UltiSnips.txt*    For Vim version 7.0 or later.
+
+        The Ultimate Plugin for Snippets in Vim~
+
+UltiSnips                                      *snippet* *snippets* *UltiSnips*
+
+1. 概述                                         |UltiSnips-description|
+   1.1 必要条件(依赖)                           |UltiSnips-requirements|
+   1.2 鸣谢                                     |UltiSnips-acknowledgments|
+2. 安装和更新                                   |UltiSnips-installnupdate|
+3. 设置和命令                                   |UltiSnips-settings|
+   3.1 命令                                     |UltiSnips-commands|
+   3.2 触发                                     |UltiSnips-triggers|
+      3.2.1 使用自定义触发函数                  |UltiSnips-trigger-functions|
+      3.2.2 自定义自动命令                      |UltiSnips-custom-autocommands|
+      3.2.3 Python模块的路径                    |UltiSnips-python-module-path|
+   3.3 片段文件的搜索路径                       |UltiSnips-snippet-search-path|
+   3.4 当心关于选择模式键映射                   |UltiSnips-warning-smappings|
+   3.5 函数                                     |UltiSnips-functions|
+      3.5.1 UltiSnips#AddSnippetWithPriority    |UltiSnips#AddSnippetWithPriority|
+      3.5.2 UltiSnips#Anon                      |UltiSnips#Anon|
+      3.5.3 UltiSnips#SnippetsInCurrentScope    |UltiSnips#SnippetsInCurrentScope|
+   3.6 缺少python支持的警告                     |UltiSnips-python-warning|
+4. 语法                                         |UltiSnips-syntax|
+   4.1 添加snippets(片段)                       |UltiSnips-adding-snippets|
+      4.1.1 字符转义                            |UltiSnips-character-escaping|
+   4.2 纯文本片段                               |UltiSnips-plaintext-snippets|
+   4.3 选择模式占位符                           |UltiSnips-visual-placeholder|
+   4.4 插入                                     |UltiSnips-interpolation|
+      4.4.1 shell脚本                           |UltiSnips-shellcode|
+      4.4.2 vim脚本                             |UltiSnips-vimscript|
+      4.4.3 python脚本                          |UltiSnips-python|
+      4.4.4 全局的snippets(片段)                |UltiSnips-globals|
+   4.5 Tabstops and Placeholders                |UltiSnips-tabstops|
+   4.6 镜像                                     |UltiSnips-mirrors|
+   4.7 Transformations                          |UltiSnips-transformations|
+      4.7.1 Replacement String                  |UltiSnips-replacement-string|
+      4.7.2 Demos                               |UltiSnips-demos|
+   4.8 Clearing snippets                        |UltiSnips-clearing-snippets|
+   4.9 Context snippets                         |UltiSnips-context-snippets|
+   4.10 Snippet actions                         |UltiSnips-snippet-actions|
+      4.10.1 Pre-expand actions                 |UltiSnips-pre-expand-actions|
+      4.10.2 Post-expand actions                |UltiSnips-post-expand-actions|
+      4.10.3 Post-jump actions                  |UltiSnips-post-jump-actions|
+   4.11 自动触发                                |UltiSnips-autotrigger|
+5. UltiSnips 和其他插件                         |UltiSnips-other-plugins|
+   5.1 已经集成的插                             |UltiSnips-integrations|
+   5.2 扩展 UltiSnips                           |UltiSnips-extending|
+6. 帮助我们                                     |UltiSnips-helping|
+7. 贡献者                                       |UltiSnips-contributors|
+
+这个插件仅仅工作在 'nocompatible' 设置的前提下
+{vi 没有这个特性，不能使用该插件}
+{只有在编译时加入了 |+python| 或 |+python3| 特性才能使用该插件}
+
+
+==============================================================================
+1. 概述                                               *UltiSnips-description*
+
+UltiSnips为vim编辑器提供snippet(文本、代码片段)管理。一个snippet是一小段文本，它
+经常被重复使用，或者它本身就包括很多重复片段。UltiSnips让你仅仅通过几个键就能插
+入一个snippet。snippet在结构化文本例如源代码中很常见，但也可用于一般的文本编辑，
+例如，在电子邮件中插入一个签名，或者是在一个文本文件中插入当前时间。
+(注：以下称snippets为片段)
+
+@SirVer发布了几个简短的演示介绍UltiSnips，讲述了它的特性和使用方法
+
+http://www.sirver.net/blog/2011/12/30/first-episode-of-ultisnips-screencast/
+http://www.sirver.net/blog/2012/01/08/second-episode-of-ultisnips-screencast/
+http://www.sirver.net/blog/2012/02/05/third-episode-of-ultisnips-screencast/
+http://www.sirver.net/blog/2012/03/31/fourth-episode-of-ultisnips-screencast/
+
+在 [Vimcasts](http://vimcasts.org) 还有三个很优秀的讲述UltiSnips的视频
+
+http://vimcasts.org/episodes/meet-ultisnips/
+http://vimcasts.org/episodes/ultisnips-python-interpolation/
+http://vimcasts.org/episodes/ultisnips-visual-placeholder/
+
+1.1 必要条件(依赖)                                    *UltiSnips-requirements*
+------------------
+
+该插件要求vim版本必须是 Vim version 7.4 或以上，而且必须设置为'nocompatible'
+
+该插件在python 2.7，3.3，3.4版本下经过测试，不保证其他版本正常工作
+
+Python 2.x 或者 Python 3.x 的接口必须是可用的。也就是说，vim编译的时候比如加入
+了|+python| 或 |+python3| 特性。下面的命令展示了如何测试你的vim编译时是否加入了这些
+特性。如有有相应的特性，就会输出1，否则输出0。
+
+测试vim编译时是否加了python2.x特性；
+    :echo has("python")
+The python version Vim is linked against can be found with: >
+    :py import sys; print(sys.version)
+
+测试vim编译时是否加了python3.x特性；
+    :echo has("python3")
+The python version Vim is linked against can be found with: >
+    :py3 import sys; print(sys.version)
+
+Note vim可能使用的不是系统的python安装的python版本，所以确保检查过了vim使用的
+python版本
+
+UltiSnips会尝试自动指定一个编译vim时使用的python版本。
+不幸的是，在某些版本的vim下，自动指定不能正常工作。
+这时，你就必须明确告诉UltiSnips使用哪个版本的python，通过使用
+'UltiSnipsUsePythonVersion' 用全局变量
+
+指定为python2.x版本： >
+   let g:UltiSnipsUsePythonVersion = 2
+
+指定为python3.x版本： >
+   let g:UltiSnipsUsePythonVersion = 3
+
+
+1.2 鸣谢                                          *UltiSnips-acknowledgments*
+-------------------
+
+UltiSnips的灵感来自于TextMate软件的snippet功能(http://macromates.com/)， 
+TextMate是Mac OS X下的一款图形化编辑器，在vim中管理片段并不是什么新鲜事。我 想感
+谢Michael Sanders，snipMate的作者，对于一些实现细节，我借用了他的插件，并被允许
+使用他的片段。
+
+=============================================================================
+2. 安装和更新                                     *UltiSnips-installnupdate*
+
+推荐的获取UltiSnips的方式是在github上关注 SirVer/ultisnips，master分支一直是稳定
+版本
+
+使用 Pathogen:                                     *UltiSnips-using-pathogen*
+
+如果你是一个 pathogen 用户，你可以从github上UltiSnips的官方源获取： >
+
+   $ cd ~/.vim/bundle && git clone git://github.com/SirVer/ultisnips.git
+
+如果你还想要默认准备好的片段，同时跟踪： >
+
+   $ cd ~/.vim/bundle && git clone git://github.com/honza/vim-snippets.git
+
+查看 pathogen 的文档获取更多关于如何更新一个插件的详细信息
+
+
+使用一个下载的版本：                     *UltiSnips-using-a-downloaded-packet*
+
+下载压缩包并解压到一个你喜欢的位置。然后把这个目录加到你的vim的runtime path中，
+你可以使用下面的代码，把它加到你的 vimrc 文件中即可 >
+   set runtimepath+=~/.vim/ultisnips_rep
+
+UltiSnips 允许需要vim位于 ftdetect/ 目录下的vim源码。不幸的是，vim只允许它出现
+在 .vim 目录中。因此你必须 链接或拷贝 它们 >
+   mkdir -p ~/.vim/ftdetect/
+   ln -s ~/.vim/ultisnips_rep/ftdetect/* ~/.vim/ftdetect/
+
+重启vim，UltiSnips就可以工作了，想要查看帮助文档，使用下面的命令 >
+   :helptags ~/.vim/ultisnips_rep/doc
+   :help UltiSnips
+
+UltiSnips 和 片段一起工作，默认的 片段 可以从这里找到：
+https://github.com/honza/vim-snippets
+
+=============================================================================
+3. 设置和命令                                            *UltiSnips-settings*
+
+3.1 命令                                                 *UltiSnips-commands*
+--------
+                                                             *:UltiSnipsEdit*
+UltiSnipsEdit 命令可以打开一个当前文件类型专用的片段定义文件。如果不存在该文
+件，将会创建一个新的，如果有多个文件会展示一个列表以供选择。 如果使用
+UltiSnipsEdit! 所有公共的片段文件也会加入到该列表以供选择。
+
+有几个变量和 UltiSnipsEdit 命令相关
+
+                                                        *g:UltiSnipsEditSplit*
+g:UltiSnipsEditSplit        定义了编辑"窗口"如何打开，可选的值如下
+                            |normal|         默认，在当前"窗口"打开
+                            |horizontal|     水平切分"窗口"并打开
+                            |vertical|       垂直切分窗口并打开
+                            |context|        水平或垂直切分窗口并打开，依赖于具体
+                                           的环境
+
+                                                        *g:UltiSnipsSnippetsDir*
+g:UltiSnipsSnippetsDir
+                            定义了自定义片段文件的存放位置。比如，如果设置为
+                            "~/.vim/mydir/UltiSnips" 而当前 'filetype' 是 "cpp"，
+                            然后，:UltiSnipsEdit 将会打开
+                            "~/.vim/mydir/UltiSnips/cpp.snippets"，前提是有这个
+                            文件，如果它不存在，:UltiSnipsEdit 将会在
+                            g:UltiSnipsSnippetDirectories 查看存在的文件，如果没
+                            有找到，:UltiSnipsEdit 将会在 g:UltiSnipsSnippetsDir
+                            目录下打开一个新的文件
+                            Note 目录名为 "snippets" 的目录留给snipMate，不能使
+                            用
+
+                                                 *g:UltiSnipsSnippetDirectories*
+g:UltiSnipsSnippetDirectories
+                            定义了查找片段文件的目录，不要把这个变量和上一个
+                            混了，要查看更多信息，参见
+                            |UltiSnips-snippet-search-path|部分
+
+                                                      *g:UltiSnipsEnableSnipMate*
+g:UltiSnipsEnableSnipMate
+                            开启在 &runtimepath 下查找 SnipMate 的片段功能。
+                            UltiSnips在查找 SnipMate 的片段的时候将会只会找
+                            名为 'snippets' 的目录。默认为 "1"，所以UltiSnips会
+                            查找 SnipMate 的片段。
+
+
+
+                                                       *:UltiSnipsAddFiletypes*
+UltiSnipsAddFiletypes 命令允许显示合并其他的文件类型的片段到当前缓冲区。比如
+如你想编辑一个 a.rst 文件，但是你想同时可以使用lua的片段，就可以使用 >
+
+   :UltiSnipsAddFiletypes rst.lua
+
+使用点文件类型语法。顺序很重要，这里的第一个文件类型将会被 UltiSnipsEdit 使用，
+而且出来的列表的顺序是按照这里的顺序来的。因此，你可以添加这个到你的
+ftplugin/rails.vim 文件 >
+
+   :UltiSnipsAddFiletypes rails.ruby
+
+我首先提到rails是因为我在使用 UltiSnipsEdit 的时候是想编辑rails的片段文件，
+而且rails的等价的片段应该覆盖ruby的片段。现在的优先级将是 rails -> ruby
+-> all。如果你有一些特殊的代码片段应该有比ruby片段更低的优先级，你可以 >
+
+   :UltiSnipsAddFiletypes ruby.programming
+
+优先级将会是 rails -> rubu -> programming  -> all
+
+3.2 触发                                                 *UltiSnips-triggers*
+--------
+
+                           *g:UltiSnipsExpandTrigger* *g:UltiSnipsListSnippets*
+               *g:UltiSnipsJumpForwardTrigger* *g:UltiSnipsJumpBackwardTrigger*
+你可以通过设置全局变量来定义用于触发 UltiSnips 的键。这些变量定义了一些键，用来
+展开一个片段，在一个片段中向前跳和向后跳，以及在列出在当前位置所有可以展开的片段
+。注意，有些终端下不发送 <c-tab> 给运行的程序。这些变量的默认值是 >
+   g:UltiSnipsExpandTrigger               <tab>
+   g:UltiSnipsListSnippets                <c-tab>
+   g:UltiSnipsJumpForwardTrigger          <c-j>
+   g:UltiSnipsJumpBackwardTrigger         <c-k>
+
+为了尽量不影响其他键映射，这些映射只有在可以展开片段，可以向前向后跳的时候才会
+生效
+
+g:UltiSnipsJumpBackwardTrigger 的默认值会影响内置的补全函数 |i_CTRL-X_CTRL-K|。一
+个解决方法是添加下面这行到你的vimrc中，或者使用一个类似于 Supertab 和 
+YouCompleteMe 的插件 >
+   inoremap <c-x><c-k> <c-x><c-k>
+
+3.2.1 使用自定义触发函数                         *UltiSnips-trigger-functions*
+------------------------
+
+对于高级用户，有4个函数可以直接映射到某个键，这和之前定义的触发按键是一致的 >
+   g:UltiSnipsExpandTrigger        <--> UltiSnips#ExpandSnippet
+   g:UltiSnipsJumpForwardTrigger   <--> UltiSnips#JumpForwards
+   g:UltiSnipsJumpBackwardTrigger  <--> UltiSnips#JumpBackwards
+
+如果你将 g:UltiSnipsExpandTrigger 和 g:UltiSnipsJumpForwardTrigger 设置为相同的
+值，你将会使用的函数式 UltiSnips#ExpandSnippetOrJump.
+
+UltiSnips#ExpandSnippet, UltiSnips#ExpandSnippetOrJump, UltiSnips#JumpForwards，
+UltiSnips#JumpBackwards，这些函数每次被调用，一个全局变量的值都会被设置，这个变
+量包含了相应的方法的返回值
+
+相应的变量和函数是
+UltiSnips#ExpandSnippet       --> g:ulti_expand_res (0: fail, 1: success)
+UltiSnips#ExpandSnippetOrJump --> g:ulti_expand_or_jump_res (0: fail, 1: expand, 2: jump)
+UltiSnips#JumpForwards        --> g:ulti_jump_forwards_res (0: fail, 1: success)
+UltiSnips#JumpBackwards       --> g:ulti_jump_backwards_res (0: fail, 1: success)
+
+查看这些返回值可能派上用场，如果你想映射一个键去展开或跳跃，但是上面的函数都没有
+成功，你想调用其他的函数。UltiSnips已经为supertab适配好了这些，不过这允许你微调
+你的tab键的使用
+
+用法如下：你要定义一个函数 >
+
+   let g:ulti_expand_or_jump_res = 0 "default value, just set once
+   function! Ulti_ExpandOrJump_and_getRes()
+     call UltiSnips#ExpandSnippetOrJump()
+     return g:ulti_expand_or_jump_res
+   endfunction
+
+然后你像这样定义你的键映射 >
+
+   inoremap <NL> <C-R>=(Ulti_ExpandOrJump_and_getRes() > 0)?"":IMAP_Jumpfunc('', 0)<CR>
+
+如果你在当前位置不能展开或跳跃，被调用将会是替代函数 IMAP_Jumpfunc('', 0)
+
+3.2.2 自定义自动命令                            *UltiSnips-custom-autocommands*
+--------------------
+
+Note 自动命令必须不以任何方式改变缓冲区。如果添加，删除，修改了行将会混淆
+UltiSnips，可能会搞乱你的片段内容
+
+                          *UltiSnipsEnterFirstSnippet* *UltiSnipsExitLastSnippet*
+为了和其他插件最大兼容，UltiSnips在一个片段被展开直到这个片段结束的时候设置了一
+些特殊的状态，包括键映射和自动命令。为了覆盖这些默认设置，提供了下列的用户自动
+命令(it fires the following "User" autocommand) >
+
+UltiSnipsEnterFirstSnippet
+UltiSnipsExitLastSnippet
+
+举个例子，为了在这些事件触发的使用调用一对自定义函数，你可以这样做： >
+
+   autocmd! User UltiSnipsEnterFirstSnippet
+   autocmd User UltiSnipsEnterFirstSnippet call CustomInnerKeyMapper()
+   autocmd! User UltiSnipsExitLastSnippet
+   autocmd User UltiSnipsExitLastSnippet call CustomInnerKeyUnmapper()
+
+Note 片段展开的时候可能是嵌套在另外一个展开的片段里的，这时候
+|UltiSnipsEnterFirstSnippet| 只会在最外层的片段被展开时触发一次，而
+|UltiSnipsExitLastSnippet|只会在最外层的片段被结束时触发一次，对于嵌套的片段展开
+他们都不会触发
+
+
+
+3.2.3 Python模块的路径                        *UltiSnips-python-module-path*
+----------------------
+
+对于更高级的用法，你可以直接编写python函数，并在其中使用 UltiSnips 的python模块
+
+这是一个小小的示例函数，用来展开一个片段： >
+
+   function! s:Ulti_ExpandSnip()
+   Python << EOF
+   import sys, vim
+   from UltiSnips import UltiSnips_Manager
+   UltiSnips_Manager.expand()
+   EOF
+   return ""
+   endfunction
+
+3.3 snippets 文件的搜索路径                   *UltiSnips-snippet-search-path*
+---------------------------
+
+UltiSnips的snippets(片段)定义文件存放在一个或多个文件夹中。有几个变量用来表示这
+些目录，以及定义UltiSnips如何加载代码片段
+
+片段定义文件存放在 片段 文件夹。一个 片段 文件夹必须是一个定义在
+'runtimepath' 中的目录的子目录。变量 g:UltiSnipsSnippetDirectories 定义了一个名
+称列表，用于 片段 目录。Note "snippets" 是留给 snipMate 的片段的，不能使用。
+默认的定义如下 >
+
+   let g:UltiSnipsSnippetDirectories=["UltiSnips"]
+
+UltiSnips 会在 'runtimepath' 中定义的目录中搜索，看是否有子目录的名词是定义在
+g:UltiSnipsSnippetDirectories中的。比如，如果你把你的 片段 文件放在一个.vim的
+子文件夹"mycoolsnippets"中，你希望它能和 UltiSnips 一起工作，那么就把下面这行加
+到你的vimrc中 >
+   let g:UltiSnipsSnippetDirectories=["UltiSnips", "mycoolsnippets"]
+如果你不想使用第三方插件提供的片段，这样定义 >
+   let g:UltiSnipsSnippetDirectories=["mycoolsnippets"]
+
+你还可以通过设置 b:UltiSnipsSnippetDirectories ，对一个缓冲区重新定义基于缓冲区
+的搜索路径，这个变量优先于全局变量
+
+|UltiSnips-adding-snippets| 解释了对于一个给定的文件类型，那些文件会被解析
+
+如果这个变量中只指定了一个目录，而且这个目录是指定为绝对路径，UltiSnips将不会在
+&runtimepath 中寻找 片段 文件，这样做能够明显提升速度，通常可以这样做 >
+
+    let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
+
+然而，你将无法使用第三方插件提供的片段，你需要将它们复制到你选择的目录中
+
+
+3.4 当心关于选择模式键映射                *UltiSnips-warning-smappings*
+--------------------------
+
+Vim 的关于 |mapmode-s| 的帮助文档: >
+    备注: 在选择模式映射可显示字符容易引起用户的混淆。最好直接用 :xmap 和 :smap 
+    来映射可显示字符。或者在定义映射后使用 :sunmap。
+
+然而，大多数vim插件，包括一些默认的vim插件，没有坚持这样做，在一个片段中，
+UltiSnips通过选择模式来标记要被覆盖的内容，已经存在的 Visual+Select 的键映射将会
+受影响。因此，UltiSnips使用一个 |:sunmap| 命令删除每个选择模式的可以打印字符的键映
+射。没有动其他的映射。特别的，不改变现有普通,插入或选择模式映射。
+
+如果你不需要这种行为，在你的vimrc中添加这句来禁用它 >
+   let g:UltiSnipsRemoveSelectModeMappings = 0
+
+如果你想为某些特定的键映射禁用这个特性，把他们添加到忽略映射列表中。比如，下面这
+行放到你的vimrc中将会取消所有选择模式的键映射，除了在它的完整定义(像|:smap|展示的
+那样)中包含了"somePlugin"以及"otherPlugin"的键映射 >
+
+   let g:UltiSnipsRemoveSelectModeMappings = 1
+   let g:UltiSnipsMappingsToIgnore = [ "somePlugin", "otherPlugin" ]
+
+
+3.5 函数                                                 *UltiSnips-functions*
+--------
+
+UltiSnips 提供了一些函数可以扩展核心功能
+
+
+ 3.5.1 UltiSnips#AddSnippetWithPriority    *UltiSnips#AddSnippetWithPriority*
+
+第一个函数是 UltiSnips#AddSnippetWithPriority(trigger, value, description,
+options, filetyp, priority). 它添加了一个新的 片段，通过使用提供的 trigger(触
+发片段的字符串)，value(片段本身), description 和 options，这个片段被添加到当
+前的文件类型(current list of snippets 是这个意思么)，查看 |UltiSnips-syntax|了解
+每个参数的意义。priority 是一个数字，定义了哪个片段优先级更高。了解 priority 更
+多信息请查看 |UltiSnips-add-snippets|。
+
+
+ 3.5.2 UltiSnips#Anon                                        *UltiSnips#Anon*
+
+第二个函数是 UltiSnips#Anon(value, ...). 它展开一个匿名的片段。匿名的片段现场定
+义并立即展开然后丢弃，匿名片段不添加到全局的片段列表，所以他们不能重用，除非再
+调用该函数。该函数接受可选的参数，按照这个顺序：trigger, description, options。
+参数和|UltiSnips#AddSnippetWithPriority|的同名函数一致。trigger 和 options 参数可
+以改变片段被展开的方式，同样的选项可以在片段定义中被指定。在这里可以查看玩着的列
+表 |UltiSnips-snippet-options|。description 在这里没有使用
+
+一个可以做例子的用例可能是从一个 reStructuredText 插件里提取的这行 >
+
+   inoremap <silent> $$ $$<C-R>=UltiSnips#Anon(':latex:\`$1\`', '$$')<cr>
+
+一旦输入两个 $ 片段就会被展开
+Note: The right-hand side of the mapping starts with an immediate retype of
+the '$$' trigger and passes '$$' to the function as the trigger argument.
+This is required in order for UltiSnips to have access to the characters
+typed so it can determine if the trigger matches or not.
+
+ 3.5.3 UltiSnips#SnippetsInCurrentScope    *UltiSnips#SnippetsInCurrentScope*
+
+第三个函数是 UltiSnips#SnippetsInCurrentScope，相当于是snipMate的
+GetSnipsInCurrentScope 函数
+
+这个函数简单的返回一个vim字典，里面装了可以有当前单词触发的片段，如果你需要当前
+缓冲区的所有片段片段的信息，你可以通过将1(表示所有)作为这个函数的第一个参数，并
+使用一个全局的变量 g:current_ulti_dict_info 来获取结果(看下面的例子)
+
+这个函数没有添加任何新的功能，但是允许第三方插件集成当前可用的片段。
+
+这类第三方插件的一个例子就是SnippetCompleteSnipMate，使用GetSnipsInCurrentScope
+函数整合当前可用片段与用户定义的缩写，并在一个补全菜单中提供
+
+这个脚本位于
+http://www.vim.org/scripts/script.php?script_id=4276.
+Note: 如果你查看上面的网页，会发现它列出两个依赖，SnippetComplete plugin 和 
+snipmate.
+你需要SnippetComplete插件,但你显然不需要snipmate,你只需要定义函数
+GetSnipsInCurrentScope。把下面的代码加到你的vimrc: >
+    function! GetSnipsInCurrentScope()
+      return UltiSnips#SnippetsInCurrentScope()
+    endfunction
+
+
+关于如何使用这个函数的第二个例子，考虑下面的函数和映射定义：
+
+function! ExpandPossibleShorterSnippet()
+  if len(UltiSnips#SnippetsInCurrentScope()) == 1 "only one candidate...
+    let curr_key = keys(UltiSnips#SnippetsInCurrentScope())[0]
+    normal diw
+    exe "normal a" . curr_key
+    exe "normal a "
+    return 1
+  endif
+  return 0
+endfunction
+inoremap <silent> <C-L> <C-R>=(ExpandPossibleShorterSnippet() == 0? '': UltiSnips#ExpandSnippet())<CR>
+
+如果你的片段的触发器是 lorem，你输入 lor，而且你没有任何其他片段的触发器匹配lor，
+然后摁<c-l>将会展开lorem的片段。
+
+关于使用这个函数的第三个例子是提取当前缓冲区的所有片段
+
+function! GetAllSnippets()
+  call UltiSnips#SnippetsInCurrentScope(1)
+  let list = []
+  for [key, info] in items(g:current_ulti_dict_info)
+    let parts = split(info.location, ':')
+    call add(list, {
+      \"key": key,
+      \"path": parts[0],
+      \"linenr": parts[1],
+      \"description": info.description,
+      \})
+  endfor
+  return list
+endfunction
+
+新的变量 g:current_ulti_dict_info 用来避免和其他已存在的第三方插件冲突，这个定义
+包含了文件路径和行号
+
+
+3.6 缺少python支持的警告                           *UltiSnips-python-warning*
+------------------------
+
+当UltiSnips被加载的时候，它会检查vim编译和运行时的python支持。如果没有检测到，会
+显示一个警告并跳过加载
+
+如果你想抑制这个警告信息,你可以添加这行到你的vimrc文件 >
+
+    let g:UltiSnipsNoPythonWarning = 1
+
+如果你的vim配置文件在多个系统间共享，而其中的一些可能没有编译vim的pyton支持，
+这可能是有用的
+
+=============================================================================
+4. 语法                                                   *UltiSnips-syntax*
+
+这章描述了如何编写自己的片段以及片段定义语法。例子是用来帮助说明的。
+
+
+4.1 添加片段                                     *UltiSnips-adding-snippets*
+------------
+
+查看|UltiSnips-snippet-search-path|，这里解释了哪个包含了片段定义的文件夹会被加载
+
+这里使用了一个类似于vim指定 |ftplugin| 的策略，UltiSnips迭代片段定义的目录，查找
+和下面匹配的文件名：ft.snippets, ft_*.snippets, 或ft/*，"ft"是当前缓冲区的
+"filetype"，而"*"是类似于shell的通配符匹配任何字符串包括空字符串。下面展示了一些
+典型的片段文件及其关联的文件类型。
+
+    snippet filename         filetype ~
+    ruby.snippets            ruby
+    perl.snippets            perl
+    c.snippets               c
+    c_my.snippets            c
+    c/a                      c
+    c/b.snippets             c
+    all.snippets             *all
+    all/a.snippets           *all
+
+* 'all' 文件类型是独有的。它表示这里的片段适用于任何文件，不论编辑的文件类型是什
+么。例如，一个日期插入片段就适合放假 all.snippets 文件中。
+
+UltiSnips支持vim的点文件类型语法。例如，如果你为 CUDA C++ 框架定义一个点文件类型，
+":set ft=cuda.cpp"，UltiSnips将会搜索并激活cuda和cpp文件的文件类型的片段
+
+片段文件的语法很简单。任何以 # 开始的行都是注释。注释会被 UltiSnips 忽略。是用注
+释来做片段的文档
+
+以关键字啊 'extends' 开始的行提供了一种组合片段文件的方法。当 'extends' 关键字包
+含在一个片段文件中，它指定 UltiSnips 把指定的文件类型的片段包括进来
+
+这个语法看起来像这样： >
+   extends ft1, ft2, ft3
+
+例如，在cpp.snippets的第一行看起来就像这样： >
+   extends c
+当UltiSnips为一个cpp文件激活片段，它首先查看所有的的c片段，并激活他们。这是一个
+方便的从一般片段创建专用片段的方式。多个 'extends' 允许出现在一个片段文件中，他
+们可以出现在文件的任何地方。
+
+
+以关键字 'priority' 开始的行设置了当前片段文件中在该行之后的的所有片段的优先级，
+一个片段文件中的片段的默认的优先级是0。当以个片段应该被展开的时候，UltiSnips会收
+集所有激活的片段文件中的所有能被当前触发器触发的片段，并且默认选中优先级最高的一
+个。例如，所有的内置(shipped)的片段优先级都小于0，所以用户定义的片段总是会覆盖
+内置(shipped)的片段。
+
+
+以关键字 'snippet' 开始的一行标记了一个片段定义的开始，而以关键字 'endsnippet'
+开始的一行标记着一个片段定义的结束。片段的定义就在这两行中间。这里是一个unix的
+shell脚本文件类型的if语句的片段定义
+
+    snippet if "if ... then (if)"
+    if ${2:[[ ${1:condition} ]]}; then
+            ${0:#statements}
+    fi
+    endsnippet
+
+开始行要符合下面的格式： >
+
+   snippet tab_trigger [ "description" [ options ] ]
+
+tab_trigger 是必须的，但 description 和 opotions 是可选的
+
+'tab_trigger'使用来触发片段的单词或字符串。
+Generally a single word is used but the tab_trigger can include spaces
+如果你希望有包含空格，你必须把触发器包到一个引号里面 >
+
+    snippet "tab trigger" [ "description" [ options ] ]
+
+引号不是触发器的一部分，键入： tab trigger 再摁展开片段的键
+
+使用引号将带空格的触发器包裹起来并不是技术上必须的。任何匹配的字符都可以。比如说，
+这行就是一个有效的片段的开始 >
+    snippet !tab trigger! [ "description" [ options ] ]
+
+通过使用其他字符来包裹触发器，引号可以包括在触发器中 >
+    snippet !"tab trigger"! [ "description" [ options ] ]
+
+我们只要键入："tab trigger"就能激活这个片段
+
+'description' 是一个描述片段的字符串。为一个片段添加描述文档，有利于和其他具有
+相同触发器的片段区分开。当一个片段被激活，但是匹配多个触发器(译者认为是：当一个
+触发器被激活，但是匹配多个片段)，UltiSnips 会展示一个列表，其中列出了所有匹配的
+片段和它们的描述。然后用户就可以选择他们想要的那个片段。
+
+                                                  *UltiSnips-snippet-options*
+
+'options' 则控制着片段的行为。'options' 通过单个字符指定。
+The 'options' characters for a snippet are combined into
+a word without spaces.(这句不知道作者想说什么)
+
+目前支持下面的options(选项)： >
+   b   一行的开始 - 有这个选项的片段只有在触发器是一行的第一个单词(如果触发器是多
+       个单词也看做一个)时才能被展开。换句话说，只要触发器前面是空白就能展开。而
+       默认是可以在任何位置展开片段，不管前面是不是非空白字符。
+
+   i   在单词中展开 - 默认只有在触发器是一行的第一个单词或者它被放在空白字符之间
+       才能被展开。有这个选项的片段会忽略触发器被放在哪。也就是说，片段可以在一
+       个单词中间被触发展开。
+
+   w   单词便捷 - 使用了这个选项，只有在触发器的开始和结束处都位于单词边界，才能
+       被展开。也就是说触发器必须放在一个非单词字符后面。单词字符由 'iskeyword'
+       设置。使用这个选项的一个例子，当触发器在一个标点符号后面，这个标点符号不是
+       另一个触发器的最后字符，这个触发器可以被展开(如果这个片段使用了这个选项)。
+
+   r   正则表达式 - 使用这个选项，触发器应当是一个python的正则表达式。如果当前键
+       入的字符串匹配定义的正则表达式。Note: 正则表达式必须被引号括起来(或者用其
+       他字符包裹)不论它是否包含空格，就像一个多个单词的触发器那样(见上文)。匹配
+       的结果会作为本地变量"match"传递给片段中的任何python代码。
+
+   t   不要展开制表符 - 如果一个片段定义中包括了领头的制表符，默认UltiSnips会根
+       据vim的下列缩进设置来展开制表符 'shiftwidth', 'softtabstop', 'expandtab'
+       和'tabstop'(比如说，如果设置了'expandtab'，制表符会被空格替代)，如果设置
+       了这个选项，UltiSnips就会忽略vim的这些设置，插入制表符本身。比如说，这个
+       设置对使用制表符来约定格式的片段很有用。
+
+   s   在跳到下一个插入点前，立即移除行尾光标前的空白字符。如果在某一个插入点，
+       在行尾有可选的文本，这将是很有用的。
+
+   m   在一个片段中，减掉所有右边的空白字符。当片段中包含空行，并且需要在展开后
+       也保持空。如果没有这个选项，在片段中的空行上将会有缩进字符。
+
+   e   上下文片段 - 使用这个选项，片段的展开将不仅仅被前面的字符控制，还会被给出
+       的python表达式控制。这个选项可以和其他选项一起指定，比如说'b'。查看
+       |UltiSnips-context-snippets|获取详细信息。
+
+   A   当条件满足时，片段会被自动地触发并展开。查看 |UltiSnips-autotrigger| 获取
+       详细信息。
+
+结束行是 'endsnippet' 关键字单独在一行 >
+
+   endsnippet
+
+当解析片段文件的时候，UltiSnips会出去'endsnippet'结束行后的换行符。
+
+
+ 4.1.1 字符转义:                              *UltiSnips-character-escaping*
+
+在片段的定义中，字符'`'，'}'，'$'，'\'有特殊意义，如果要插入这些字符，使用'\'来
+转义他们。
+
+
+4.2 纯文本片段                                  *UltiSnips-plaintext-snippets*
+--------------
+
+为了说明纯文本片段，让我们以一个小的例子开始。你可以自己尝试这些例子。很简单，只
+要用vim编辑一个新的文件就可以。作为例子的片段会被添加到 'all.snippets'，所以你
+可能想要在vim中打开并便捷它。 >
+   ~/.vim/UltiSnips/all.snippets
+
+把这个加到 'all.snippets' 并保存
+
+------------------- SNIP -------------------
+snippet bye "My mail signature"
+Good bye, Sir. Hope to talk to you soon.
+- Arthur, King of Britain
+endsnippet
+------------------- SNAP -------------------
+
+当你修改了一个片段文件，UltiSnips会自动检测到并加载改动。所以，在一个空的缓冲区
+中，键入触发器'bye'，然后按<tab>键。
+
+bye<Tab> -->
+Good bye, Sir. Hope to talk to you soon.
+- Arthur, King of Britain
+
+单词'bye'将会被片段中定义的文本替换。
+
+
+4.3 选择模式占位符                              *UltiSnips-visual-placeholder*
+------------------
+
+片段中可以包含一个特殊的占位符，叫做 ${VISUAL}。${VISUAL} 将会在展开的时候被替换
+为展开之前选中的文本。
+
+为了查看一个带有${VISUAL}的片段如何工作，定义一个带有该占位符的片段，使用vim的
+选择模式选中一些字符，然后键入你想展开的片段的触发器(见g:UltiSnipsExpandTrigger)
+。选中的文本会被删除，你被带入了插入模式。然后键入触发器再按展开触发器的键。在
+片段被展开的同时，之前选中的文字被放到了${VISUAL}所在的位置。
+
+${VISUAL}占位符可以包含默认的文本，当片段没有在选择模式下被展开的时候将会使用默
+认文本替换${VISUAL}占位符。语法就像这样： >
+    ${VISUAL:default text}
+
+${VISUAL}占位符还可以定义一个转换(查看|UltiSnips-transformations|)。语法就像这样： >
+    ${VISUAL:default/search/replace/option}.
+
+这是一个很简单的例子用来说明选择模式转换。片段将会拿走选中的文本，然后用 "is" 替
+换掉每个 "should"，然后用tags把结果包裹起来。
+
+------------------- SNIP -------------------
+snippet t
+<tag>${VISUAL:inside text/should/is/g}</tag>
+endsnippet
+------------------- SNAP -------------------
+
+从这行文字开始吧： >
+   this should be cool
+
+把贯标放到单词 "should" 上，然后键入：viw(选择模式 -> 选择一个单词)。然后键入
+<tab>，键入 "t" 然后再键入 <tab>。结果是： >
+   -> this <tag>is</tag> be cool
+
+如果你没有在选择模式下展开这个片段(比如，在插入模式下插入 t<tab>，你将会得到)： >
+   <tag>inside text</tag>
+
+
+4.4 插入                                            *UltiSnips-interpolation*
+--------
+
+ 4.4.1 shell脚本:                                       *UltiSnips-shellcode*
+
+片段文件中可以包含shell脚本。把一个shell命令放到一个片段中，然后当片段被展开的
+时候，shell脚本会被shell执行所产生的输出替换。shell脚本的语法很简单：把代码包裹
+在反引号总，'`'。当片段被展开，UltiSnips会首先将他写入一个临时脚本，然后执行它。
+shell脚本会被标准输出的结果替换。任何你能在脚本中运行的东西都能用到shell脚本中。
+包括一个 shebang 行，比如说 #!/usr/bin/perl，然后你的片段就能使用其他程序来运行
+脚本，例如perl。
+
+这儿有一些例子。片段使用了一个shell命令去插入当前日期。
+
+------------------- SNIP -------------------
+snippet today
+Today is the `date +%d.%m.%y`.
+endsnippet
+------------------- SNAP -------------------
+
+today<tab> ->
+Today is the 15.07.09.
+
+
+This example inserts the current date using perl.
+这个例子使用perl插入当前日期。
+
+------------------- SNIP -------------------
+snippet today
+Today is `#!/usr/bin/perl
+@a = localtime(); print $a[3] . '.' . $a[4] . '.' . ($a[5]+1900);`.
+endsnippet
+------------------- SNAP -------------------
+today<tab> ->
+Today is 15.6.2009.
+
+
+ 4.4.2 vim脚本:                                       *UltiSnips-vimscript*
+
+你也可以使用vim脚本(有时也叫作vimL)来插入。语法和shell脚本本很相似。把代码包裹
+到反引号中，为了区分它是一个vim脚本，用 '!v' 作为代码的开始。这里是一个计算当前
+行的单词数的例子：
+
+------------------- SNIP -------------------
+snippet indent
+Indent is: `!v indent(".")`.
+endsnippet
+------------------- SNAP -------------------
+    (note the 4 spaces in front): indent<tab> ->
+    (note the 4 spaces in front): Indent is: 4.
+
+
+ 4.4.3 Python:                                             *UltiSnips-python*
+
+python脚本插入是迄今为止最强大的。除了使用'!p'开始之外，语法就像vim脚本一样。
+python脚本可以通过使用 shebang 行'#!/usr/bin/python'来运行，但是使用 '!p' 可以
+和一些预定义对象和变量一起使用，它们可以简化和缩短代码。例如，一个 'snip' 对象
+的实例隐含在python代码中。使用 '!p' 指定的python代码和另一种方式是不同的。通常
+一个片段被展开，将会使用代码的标准输出来提换代码部分。但是在python脚本中，'snip'
+的实例的属性'rv'将会用来替换代码。标准输出会被忽略。
+
+在python脚本中自动定义的变量是这些： >
+
+   fn      - 当前文件名
+   path    - 当前文件的完整路径
+   t       - 占位符的值，t[1] 就是 ${1} 表示的文本，以此类推
+   snip    - UltiSnips.TextObjects.SnippetUtil 对象的实例。有一些简化插入处理的
+	     方法
+   context - 上下文条件的结果。 参见 |UltiSnips-context-snippets|
+
+'snip' 对象提供了下列方法： >
+
+    snip.mkline(line="", indent=None):
+        is None, then mkline prepends spaces and/or tabs appropriate to the
+        current 'tabstop' and 'expandtab' variables.
+	返回一行将要添加到结果中的文本。如果indent参数为None，该函数会根据当前
+	的 'tabstop' 和 'expandtab' 设置来添加 空格和/或制表符的缩进。
+
+    snip.shift(amount=1):
+	根据 'shiftwidth' 定义和空格数，'amount' times 来转换 mkline 使用的缩进
+	级别。
+
+    snip.unshift(amount=1):
+        根据 'shiftwidth' 设置的空格数目，'amount' times，转换mkline使用的默认的
+	缩进级别
+
+    snip.reset_indent():
+        重置内置的缩进级别为其初始值。
+
+    snip.opt(var, default):
+        检查是否设置了vim变量 'var'。如果设置了，就返回变量的值，否则，返回默认
+        值
+
+'snip' 对象提供了一些属性： >
+
+    snip.rv:
+        'rv'是返回值，这个文本将会替换掉片段中定义的python代码块，它被初始化为空
+        的字符串。This description the 'res' variable.
+
+    snip.c:
+        表示片段中当前在python代码块位置的文本。一旦插入完成他就被设置为空。因此
+        你可以检查 if snip.c != "" 来确保插入只进行了一次。
+        This deprecates the "cur" variable.
+
+    snip.v:
+         封装了关于 ${VISUAL} 占位符的数据。有两个属性：
+             snip.v.mode   ('v', 'V', '^V', 参见 |visual-mode| )
+             snip.v.text   被选中的文本
+
+    snip.fn:
+        当前文件的文件名。
+
+    snip.basename:
+        当前文件的不到扩展名的文件名。
+
+    snip.ft:
+        当前文件类型。
+
+    snip.p:
+        最后选定的占位符。包含占位符对象，占位符对象包含以下属性：
+
+        'current_text' - 在选中文本的时候，占位符对应的文本
+        'start' - placeholder start on the moment of selection;
+        'end' - placeholder end on the moment of selection;
+
+为了方便你的使用，'snip'还提供了下列操作： >
+
+    snip >> amount:
+        Equivalent to snip.shift(amount)
+    snip << amount:
+        Equivalent to snip.unshift(amount)
+    snip += line:
+        Equivalent to "snip.rv += '\n' + snip.mkline(line)"
+
+任何定义在python代码块中的变量可以在其他在同一个片段中的python代码块中使用。当然
+python模块'vim'，'re'，'os'，'string'，'random'已经被预加载到片段中的python代码
+块了。其他模块可以使用python的'import'语句来导入。
+
+python代码块允许创建非常灵活得片段。举个例子，下面的片段镜像第一个插入点的文本
+到同一行并右对齐，而且转换成了大写。
+
+------------------- SNIP -------------------
+snippet wow
+${1:Text}`!p snip.rv = (75-2*len(t[1]))*' '+t[1].upper()`
+endsnippet
+------------------- SNAP -------------------
+wow<tab>Hello World ->
+Hello World                                                     HELLO WORLD
+
+下面的片段正则表达式选项，使用python的匹配对象说明正则表达式分组。这表明片段的
+展开依赖于定义片段时使用的触发器，而触发器本身是可以变化的。
+
+------------------- SNIP -------------------
+snippet "be(gin)?( (\S+))?" "begin{} / end{}" br
+\begin{${1:`!p
+snip.rv = match.group(3) if match.group(2) is not None else "something"`}}
+    ${2:${VISUAL}}
+\end{$1}$0
+endsnippet
+------------------- SNAP -------------------
+be<tab>center<c-j> ->
+\begin{center}
+
+\end{center}
+------------------- SNAP -------------------
+be center<tab> ->
+\begin{center}
+
+\end{center}
+
+第二种形式是第一种的变种，都会产生相同的结果，但是它说明了正则表达式分组是如何
+工作的。使用正则表达式的这种发哪个是有一些缺点：
+1. 如果你同时使用<tab>展开片段和补全的话，当你键入"be form<tab>"，期待它来补全
+   "be formatted"，你最终你将得到上面的 SNAP，但这不是你想要的。
+2. 片段将会难以读懂。
+
+然而，最大的优势是，你可以创建考虑触发器之前的文本的片段。这样，你就可以使用它来
+创建后缀片段，这在一些IDE中非常流行。(触发的时候会根据触发器之前的文本得到不同的
+可触发列表)
+
+------------------- SNIP -------------------
+snippet "(\w+).par" "Parenthesis (postfix)" r
+(`!p snip.rv = match.group(1)`$1)$0
+endsnippet
+------------------- SNAP -------------------
+something.par<tab> ->
+(something)
+
+------------------- SNIP -------------------
+snippet "([^\s].*)\.return" "Return (postfix)" r
+return `!p snip.rv = match.group(1)`$0
+endsnippet
+------------------- SNAP -------------------
+value.return<tab> ->
+return value
+
+
+ 4.4.4 全局片段:                                         *UltiSnips-globals*
+
+全局片段提供了一种在多个片段中重用一些通用代码的方式。目前只支持python代码。执行
+全局片段的内容的结果会被放到片段文件中每个python代码块的全局数据域中。要创建一个
+全局片段，使用关键字 'global' 代替 'snippet'，对于python代码，使用 '!p' 作为触发
+器。列入，下面的片段作为最后一个例子，他们将产生相同的输出。无论如何，用这样的语
+法，'upper_right' 就可以被其他片段重用。
+
+------------------- SNIP -------------------
+global !p
+def upper_right(inp):
+    return (75 - 2 * len(inp))*' ' + inp.upper()
+endglobal
+
+snippet wow
+${1:Text}`!p snip.rv = upper_right(t[1])`
+endsnippet
+------------------- SNAP -------------------
+wow<tab>Hello World ->
+Hello World                                                     HELLO WORLD
+
+python的全局函数可以被保存到一个python模块然后被导入。这使得全局函数可以很容易地
+在所有片段文件中被访问到。自从vim7.4以后，你可以直接把python文件放到
+~/.vim/python/ 然后直接导入它们到你的片段中。举个例子，使用
+~/.vim/pythonx/my_snippets_helpers.py  >
+
+   global !p
+   from my_snippet_helpers import *
+   endglobal
+
+
+4.5 插入点和占位符              *UltiSnips-tabstops* *UltiSnips-placeholders*
+------------------
+
+片段用来在一个文档中快速插入重用的文本。通常这个文本有固定的结构和变化的成分。
+插入点可以用来简单的改变变化的内容，插入你想要的内容，然后跳到下一个变化的部分，
+插入内容，然后继续知道所有的变化的部分都完成。
+
+插入点的语法是一个 $ 符号紧跟着一个数字，例如，'$1'。插入点遵循从一号开始然后按
+顺序排列，'$0'是一个特殊的插入点。不论有多少插入点被定义，它总是片段中的最后一个
+插入点。如果没有定义 '$0'，'$0'将默认被定义在片段的末尾。
+
+这里是一个简单的例子
+
+------------------- SNIP -------------------
+snippet letter
+Dear $1,
+$0
+Yours sincerely,
+$2
+endsnippet
+------------------- SNAP -------------------
+letter<tab>Ben<c-j>Paul<c-j>Thanks for suggesting UltiSnips!->
+Dear Ben,
+Thanks for suggesting UltiSnips!
+Yours sincerely,
+Paul
+
+你可以使用<c-j>跳到下一个插入点，用<c-k>跳到上一个插入点。<tab>键没有被用作跳
+到下一个插入点是因为很多人(包括我)使用<tab>来补全。查看 |UltiSnips-triggers| 来
+获得有关为插入点定义不同的键的帮助
+
+为一个插入点设置默认值常常是有用的。默认值可能是变量值常用的部分，或者是一个词
+或短语，提醒你这里应该输入什么。要插入默认值，语法是 '${1:value}'。
+
+下面的例子说明了一个shell脚本的case语句的片段。插入点使用默认值来提醒用户应该输
+入什么值
+
+------------------- SNIP -------------------
+snippet case
+case ${1:word} in
+    ${2:pattern} ) $0;;
+esac
+endsnippet
+------------------- SNAP -------------------
+
+case<tab>$option<c-j>-v<c-j>verbose=true
+case $option in
+    -v ) verbose=true;;
+esac
+
+
+有是有在一个插入点中放一个插入点是很有用的。要这样做，简单地将嵌套的插入点作为
+默认文本的一部分即可。考虑下面的例子，它说明了一个html的<a>标签片段
+
+------------------- SNIP -------------------
+snippet a
+<a href="${1:http://www.${2:example.com}}"</a>
+    $0
+</a>
+endsnippet
+------------------- SNAP -------------------
+
+当这个片段被展开，第一个插入点有一个默认值'http://www.example.com'。如果你想要
+'http://'模式，跳到下一个插入点。他有一个默认值'example.com'。它可以被任何你想
+插入的域名替换
+
+a<tab><c-j>google.com<c-j>Google ->
+<a href="http://www.google.com">
+    Google
+</a>
+
+如果在第一个插入点你想要不同的url模式，或是替换默认的url用一个命令的锚，'#name'，
+你可以键入你想要的值。
+
+a<tab>#top<c-j>Top ->
+<a href="#top">
+    Top
+</a>
+
+在最后一个例子中，在第一个插入点插入任何文本来替换默认值，包括第二个插入点也可以
+被键入的文本覆盖。所以第二个插入点本质上被删除了，当执行跳到下一个插入点，
+UltiSnipsa移动到剩下的下一个插入点'$0'。这个特性可以用来有意的给用户提供可选的插
+入点值。
+
+这里有一个例子来说明它。
+
+------------------- SNIP -------------------
+snippet a
+<a href="$1"${2: class="${3:link}"}>
+    $0
+</a>
+endsnippet
+------------------- SNAP -------------------
+
+这里，'$1' 标记了第一个插入点。它假设你总想要添加一个href属性的值。输入url后按
+<c-j>，跳到第二个插入点，'$2'。这个插入点事可选的。默认值是 'class="link"'。你可
+以按 <c-j> 接受这个插入点，然后就会跳到第三个插入点，$3，然后你键入class属性的
+值，或者，在第二个插入点你可以按 退格键从而用空字符串替换第二个插入点的默认文本，
+也就是删除它。在这两种情况下，继续按<c-j>就可以跳到最后在<a>标签内的插入点。
+
+a<tab>http://www.google.com<c-j><c-j>visited<c-j>Google ->
+<a href="http://www.google.com" class="visited">
+    Google
+</a>
+
+a<tab>http://www.google.com<c-j><BS><c-j>Google ->
+<a href="http://www.google.com">
+    Google
+</a>
+
+默认值中还可以包含镜像，转换和插入。
+
+
+4.6 镜像                                                  *UltiSnips-mirrors*
+--------
+
+Mirrors repeat the content of a tabstop. During snippet expansion when you
+enter the value for a tabstop, all mirrors of that tabstop are replaced with
+the same value. To mirror a tabstop simply insert the tabstop again using the
+"dollar sign followed by a number" syntax, e.g., '$1'.
+
+A tabstop can be mirrored multiple times in one snippet, and more than one
+tabstop can be mirrored in the same snippet. A mirrored tabstop can have a
+default value defined. Only the first instance of the tabstop need have a
+default value. Mirrored tabstop will take on the default value automatically.
+
+Mirrors are handy for start-end tags, for example, TeX 'begin' and 'end' tag
+labels, XML and HTML tags, and C code #ifndef blocks. Here are some snippet
+examples.
+
+------------------- SNIP -------------------
+snippet env
+\begin{${1:enumerate}}
+    $0
+\end{$1}
+endsnippet
+------------------- SNAP -------------------
+env<tab>itemize ->
+\begin{itemize}
+
+\end{itemize}
+
+------------------- SNIP -------------------
+snippet ifndef
+#ifndef ${1:SOME_DEFINE}
+#define $1
+$0
+#endif /* $1 */
+endsnippet
+------------------- SNAP -------------------
+ifndef<tab>WIN32 ->
+#ifndef WIN32
+#define WIN32
+
+#endif /* WIN32 */
+
+
+4.7 Transformations                               *UltiSnips-transformations*
+-------------------
+
+Note: Transformations are a bit difficult to grasp so this chapter is divided
+into two sections. The first describes transformations and their syntax, and
+the second illustrates transformations with demos.
+
+Transformations are like mirrors but instead of just copying text from the
+original tabstop verbatim, a regular expression is matched to the content of
+the referenced tabstop and a transformation is then applied to the matched
+pattern. The syntax and functionality of transformations in UltiSnips follow
+very closely to TextMate transformations.
+
+A transformation has the following syntax: >
+   ${<tab_stop_no/regular_expression/replacement/options}
+
+The components are defined as follows: >
+   tab_stop_no        - The number of the tabstop to reference
+   regular_expression - The regular expression the value of the referenced
+                        tabstop is matched on
+   replacement        - The replacement string, explained in detail below
+   options            - Options for the regular expression
+
+The options can be any combination of >
+   g    - global replace
+          By default, only the first match of the regular expression is
+          replaced. With this option all matches are replaced.
+   i    - case insensitive
+          By default, regular expression matching is case sensitive. With this
+          option, matching is done without regard to case.
+   m    - multiline
+          By default, the '^' and '$' special characters only apply to the
+          start and end of the entire string; so if you select multiple lines,
+          transformations are made on them entirely as a whole single line
+          string. With this option, '^' and '$' special characters match the
+          start or end of any line within a string ( separated by newline
+          character - '\n' ).
+   a    - ascii conversion
+          By default, transformation are made on the raw utf-8 string. With
+          this option, matching is done on the corresponding ASCII string
+          instead, for example 'à' will become 'a'.
+          This option required the python package 'unidecode'.
+
+The syntax of regular expressions is beyond the scope of this document. Python
+regular expressions are used internally, so the python 're' module can be used
+as a guide. See http://docs.python.org/library/re.html.
+
+The syntax for the replacement string is unique. The next paragraph describes
+it in detail.
+
+
+ 4.7.1 Replacement String:                     *UltiSnips-replacement-string*
+
+The replacement string can contain $no variables, e.g., $1, which reference
+matched groups in the regular expression. The $0 variable is special and
+yields the whole match. The replacement string can also contain special escape
+sequences: >
+   \u   - Uppercase next letter
+   \l   - Lowercase next letter
+   \U   - Uppercase everything till the next \E
+   \L   - Lowercase everything till the next \E
+   \E   - End upper or lowercase started with \L or \U
+   \n   - A newline
+   \t   - A literal tab
+
+Finally, the replacement string can contain conditional replacements using the
+syntax (?no:text:other text). This reads as follows: if the group $no has
+matched, insert "text", otherwise insert "other text". "other text" is
+optional and if not provided defaults to the empty string, "". This feature
+is very powerful. It allows you to add optional text into snippets.
+
+
+ 4.7.2 Demos:                                               *UltiSnips-demos*
+
+Transformations are very powerful but often the syntax is convoluted.
+Hopefully the demos below help illustrate transformation features.
+
+Demo: Uppercase one character
+------------------- SNIP -------------------
+snippet title "Title transformation"
+${1:a text}
+${1/\w+\s*/\u$0/}
+endsnippet
+------------------- SNAP -------------------
+title<tab>big small ->
+big small
+Big small
+
+
+Demo: Uppercase one character and global replace
+------------------- SNIP -------------------
+snippet title "Titlelize in the Transformation"
+${1:a text}
+${1/\w+\s*/\u$0/g}
+endsnippet
+------------------- SNAP -------------------
+title<tab>this is a title ->
+this is a title
+This Is A Title
+
+
+Demo: ASCII transformation
+------------------- SNIP -------------------
+snippet ascii "Replace non ascii chars"
+${1: an accentued text}
+${1/.*/$0/a}
+endsnippet
+------------------- SNAP -------------------
+ascii<tab>à la pêche aux moules
+à la pêche aux moules
+a la peche aux moules
+
+
+Demo: Regular expression grouping
+      This is a clever c-like printf snippet, the second tabstop is only shown
+      when there is a format (%) character in the first tabstop.
+
+------------------- SNIP -------------------
+snippet printf
+printf("${1:%s}\n"${1/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\);)/}
+endsnippet
+------------------- SNAP -------------------
+printf<tab>Hello<c-j> // End of line ->
+printf("Hello\n"); // End of line
+
+But
+printf<tab>A is: %s<c-j>A<c-j> // End of line ->
+printf("A is: %s\n", A); // End of line
+
+
+There are many more examples of what can be done with transformations in the
+bundled snippets.
+
+
+4.8 Clearing snippets                           *UltiSnips-clearing-snippets*
+
+To remove snippets for the current file type, use the 'clearsnippets'
+directive.
+
+------------------- SNIP -------------------
+clearsnippets
+------------------- SNAP -------------------
+
+'clearsnippets' removes all snippets with a priority lower than the current
+one. For example, the following cleares all snippets that have priority <= 1,
+even though the example snippet is defined after the 'clearsnippets'.
+
+------------------- SNIP -------------------
+priority 1
+clearsnippets
+
+priority -1
+snippet example "Cleared example"
+	This will never be expanded.
+endsnippet
+------------------- SNAP -------------------
+
+To clear one or more specific snippet, provide the triggers of the snippets as
+arguments to the 'clearsnippets' command. The following example will clear the
+snippets 'trigger1' and 'trigger2'.
+
+------------------- SNIP -------------------
+clearsnippets trigger1 trigger2
+------------------- SNAP -------------------
+
+
+4.9 Context snippets                            *UltiSnips-context-snippets*
+
+Context snippets can be enabled by using 'e' option in snippet definition.
+
+In that case snippet should be defined using this syntax: >
+
+    snippet tab_trigger "description" "expression" options
+
+Context can be defined using special header using this syntax: >
+
+    context "expression"
+    snippet tab_trigger "description" options
+
+The 'expression' can be any python expression. If 'expression' evaluates to
+'True', then this snippet will be chosen for expansion. The 'expression' must
+be wrapped with double-quotes.
+
+The following python modules are automatically imported into the scope before
+'expression' is evaluated: 're', 'os', 'vim', 'string', 'random'.
+
+Global variable `snip` will be available with following properties:
+    'snip.window' - alias for 'vim.current.window'
+    'snip.buffer' - alias for 'vim.current.window.buffer'
+    'snip.cursor' - cursor object, which behaves like
+        'vim.current.window.cursor', but zero-indexed and with following
+        additional methods:
+        - 'preserve()' - special method for executing pre/post/jump actions;
+        - 'set(line, column)' - sets cursor to specified line and column;
+        - 'to_vim_cursor()' - returns 1-indexed cursor, suitable for assigning
+          to 'vim.current.window.cursor';
+    'snip.line' and 'snip.column' - aliases for cursor position (zero-indexed);
+    'snip.visual_mode' - ('v', 'V', '^V', see |visual-mode|);
+    'snip.visual_text' - last visually-selected text;
+    'snip.last_placeholder' - last active placeholder from previous snippet
+        with following properties:
+
+        - 'current_text' - text in the placeholder on the moment of selection;
+        - 'start' - placeholder start on the moment of selection;
+        - 'end' - placeholder end on the moment of selection;
+
+
+
+------------------- SNIP -------------------
+snippet r "return" "re.match('^\s+if err ', snip.buffer[snip.line-1])" be
+return err
+endsnippet
+------------------- SNAP -------------------
+
+That snippet will expand to 'return err' only if the previous line is starting
+from 'if err' prefix.
+
+Note: context snippets prioritized over non-context ones. It makes possible to
+use non-context snippets as fallback, if no context matched:
+
+------------------- SNIP -------------------
+snippet i "if ..." b
+if $1 {
+    $2
+}
+endsnippet
+
+snippet i "if err != nil" "re.match('^\s+[^=]*err\s*:?=', snip.buffer[snip.line-1])" be
+if err != nil {
+    $1
+}
+endsnippet
+------------------- SNAP -------------------
+
+That snippet will expand into 'if err != nil' if previous line will
+match 'err :=' prefix, otherwise the default 'if' snippet will be expanded.
+
+It's a good idea to move context conditions to a separate module, so it can be
+used by other UltiSnips users. In that case, module should be imported
+using 'global' keyword, like this:
+
+------------------- SNIP -------------------
+global !p
+import my_utils
+endglobal
+
+snippet , "return ..., nil/err" "my_utils.is_return_argument(snip)" ie
+, `!p if my_utils.is_in_err_condition():
+    snip.rv = "err"
+else:
+    snip.rv = "nil"`
+endsnippet
+------------------- SNAP -------------------
+
+That snippet will expand only if the cursor is located in the return statement,
+and then it will expand either to 'err' or to 'nil' depending on which 'if'
+statement it's located. 'is_return_argument' and 'is_in_err_condition' are
+part of custom python module which is called 'my_utils' in this example.
+
+Context condition can return any value which python can use as condition in
+it's 'if' statement, and if it's considered 'True', then snippet will be
+expanded. The evaluated value of 'condition' is available in the 'snip.context'
+variable inside the snippet:
+
+------------------- SNIP -------------------
+snippet + "var +=" "re.match('\s*(.*?)\s*:?=', snip.buffer[snip.line-1])" ie
+`!p snip.rv = snip.context.group(1)` += $1
+endsnippet
+------------------- SNAP -------------------
+
+That snippet will expand to 'var1 +=' after line, which begins from 'var1 :='.
+
+                                                  *UltiSnips-capture-placeholder*
+
+You can capture placeholder text from previous snippet by using following
+trick:
+------------------- SNIP -------------------
+snippet = "desc" "snip.last_placeholder" Ae
+`!p snip.rv = snip.context.current_text` == nil
+endsnippet
+------------------- SNAP -------------------
+
+That snippet will be expanded only if you will replace selected tabstop in
+other snippet (like, as in 'if ${1:var}') and will replace that tabstop by
+tabstop value following by ' == nil'.
+
+
+4.10 Snippets actions                             *UltiSnips-snippet-actions*
+---------------------
+
+Snippet actions is an arbitrary python code which can be executed at specific
+points in lifetime of the snippet.
+
+There are three types of actions:
+
+* Pre-expand - invoked just after trigger condition was matched, but before
+  snippet actually expanded;
+* Post-expand - invoked after snippet was expanded and interpolations
+  was applied for the first time, but before jump on the first placeholder.
+* Jump - invoked just after jump to the next/prev placeholder.
+
+Specified code will be evaluated at stages defined above and same global
+variables and modules will be available that are stated in
+the |UltiSnips-context-snippets| section.
+
+                                                *UltiSnips-buffer-proxy*
+
+Note: special variable called 'snip.buffer' should be used for all buffer
+modifications. Not 'vim.current.buffer' and not 'vim.command("...")', because
+of in that case UltiSnips will not be able to track changes in buffer from
+actions.
+
+'snip.buffer' has the same interface as 'vim.current.window.buffer'.
+
+4.10.1 Pre-expand actions                       *UltiSnips-pre-expand-actions*
+
+Pre-expand actions can be used to match snippet in one location and then
+expand it in the different location. Some useful cases are: correcting
+indentation for snippet; expanding snippet for function declaration in another
+function body with moving expansion point beyond initial function; performing
+extract method refactoring via expanding snippet in different place.
+
+Pre-expand action declared as follows: >
+    pre_expand "python code here"
+    snippet ...
+    endsnippet
+
+Buffer can be modified in pre-expand action code through variable called
+'snip.buffer', snippet expansion position will be automatically adjusted.
+
+If cursor line (where trigger was matched) need to be modified, then special
+variable method 'snip.cursor.set(line, column)' must be called with the
+desired cursor position. In that case UltiSnips will not remove any matched
+trigger text and it should be done manually in action code.
+
+To addition to the scope variables defined above 'snip.visual_content' will be
+also declared and will contain text that was selected before snippet expansion
+(similar to $VISUAL placeholder).
+
+Following snippet will be expanded at 4 spaces indentation level no matter
+where it was triggered.
+
+------------------- SNIP -------------------
+pre_expand "snip.buffer[snip.line] = ' '*4; snip.cursor.set(line, 4)"
+snippet d
+def $1():
+    $0
+endsnippet
+------------------- SNAP -------------------
+
+Following snippet will move the selected code to the end of file and create
+new method definition for it:
+
+------------------- SNIP -------------------
+pre_expand "del snip.buffer[snip.line]; snip.buffer.append(''); snip.cursor.set(len(snip.buffer)-1, 0)"
+snippet x
+def $1():
+	${2:${VISUAL}}
+endsnippet
+------------------- SNAP -------------------
+
+4.10.2 Post-expand actions                     *UltiSnips-post-expand-actions*
+
+Post-expand actions can be used to perform some actions based on the expanded
+snippet text. Some cases are: code style formatting (e.g. inserting newlines
+before and after method declaration), apply actions depending on python
+interpolation result.
+
+Post-expand action declared as follows: >
+    post_expand "python code here"
+    snippet ...
+    endsnippet
+
+Buffer can be modified in post-expand action code through variable called
+'snip.buffer', snippet expansion position will be automatically adjusted.
+
+Variables 'snip.snippet_start' and 'snip.snippet_end' will be defined at the
+action code scope and will point to positions of the start and end of expanded
+snippet accordingly in the form '(line, column)'.
+
+Note: 'snip.snippet_start' and 'snip.snippet_end' will automatically adjust to
+the correct positions if post-action will insert or delete lines before
+expansion.
+
+Following snippet will expand to method definition and automatically insert
+additional newline after end of the snippet. It's very useful to create a
+function that will insert as many newlines as required in specific context.
+
+------------------- SNIP -------------------
+post_expand "snip.buffer[snip.snippet_end[0]+1:snip.snippet_end[0]+1] = ['']"
+snippet d "Description" b
+def $1():
+	$2
+endsnippet
+------------------- SNAP -------------------
+
+4.10.3 Post-jump actions                         *UltiSnips-post-jump-actions*
+
+Post-jump actions can be used to trigger some code based on user input into
+the placeholders. Notable use cases: expand another snippet after jump or
+anonymous snippet after last jump (e.g. perform move method refactoring and
+then insert new method invokation); insert heading into TOC after last jump.
+
+Jump-expand action declared as follows: >
+    post_jump "python code here"
+    snippet ...
+    endsnippet
+
+Buffer can be modified in post-jump action code through variable called
+'snip.buffer', snippet expansion position will be automatically adjusted.
+
+Next variables and methods will be also defined in the action code scope:
+* 'snip.tabstop' - number of tabstop jumped onto;
+* 'snip.jump_direction' - '1' if jumped forward and '-1' otherwise;
+* 'snip.tabstops' - list with tabstop objects, see above;
+* 'snip.snippet_start' - (line, column) of start of the expanded snippet;
+* 'snip.snippet_end' - (line, column) of end of the expanded snippet;
+* 'snip.expand_anon()' - alias for 'UltiSnips_Manager.expand_anon()';
+
+Tabstop object has several useful properties:
+* 'start' - (line, column) of the starting position of the tabstop (also
+  accessible as 'tabstop.line' and 'tabstop.col').
+* 'end' - (line, column) of the ending position;
+* 'current_text' - text inside the tabstop.
+
+Following snippet will insert section in the Table of Contents in the vim-help
+file:
+
+------------------- SNIP -------------------
+post_jump "if snip.tabstop == 0: insert_toc_item(snip.tabstops[1], snip.buffer)"
+snippet s "section" b
+`!p insert_delimiter_0(snip, t)`$1`!p insert_section_title(snip, t)`
+`!p insert_delimiter_1(snip, t)`
+$0
+endsnippet
+------------------- SNAP -------------------
+
+'insert_toc_item' will be called after first jump and will add newly entered
+section into the TOC for current file.
+
+Note: It is also possible to trigger snippet expansion from the jump action.
+In that case method 'snip.cursor.preserve()' should be called, so UltiSnips
+will know that cursor is already at the required position.
+
+Following example will insert method call at the end of file after user jump
+out of method declaration snippet.
+
+------------------- SNIP -------------------
+global !p
+def insert_method_call(name):
+	vim.command('normal G')
+	snip.expand_anon(name + '($1)\n')
+endglobal
+
+post_jump "if snip.tabstop == 0: insert_method_call(snip.tabstops[1].current_text)"
+snippet d "method declaration" b
+def $1():
+	$2
+endsnippet
+------------------- SNAP -------------------
+
+4.11 Autotrigger                                       *UltiSnips-autotrigger*
+----------------
+
+Note: vim should be newer than 7.4.214 to support this feature.
+
+Many language constructs can occur only at specific places, so it's
+possible to use snippets without manually triggering them.
+
+Snippet can be marked as autotriggered by specifying 'A' option in the snippet
+definition.
+
+After snippet is defined as being autotriggered, snippet condition will be
+checked on every typed character and if condition matches, then snippet will
+be triggered.
+
+*Warning:* using of this feature can lead to significant vim slowdown. If you
+discovered that, report an issue to the github.com/SirVer/UltiSnips.
+
+Consider following snippets, that can be usefull in Go programming:
+------------------- SNIP -------------------
+snippet "^p" "package" rbA
+package ${1:main}
+endsnippet
+
+snippet "^m" "func main" rbA
+func main() {
+	$1
+}
+endsnippet
+------------------- SNAP -------------------
+
+When "p" character will occur in the beginning of the line, it will be
+automatically expanded into "package main". Same with "m" character. There is
+no need to press trigger key after "m""
+
+==============================================================================
+5. UltiSnips and Other Plugins                      *UltiSnips-other-plugins*
+
+5.1 Existing Integrations                            *UltiSnips-integrations*
+-------------------------
+
+UltiSnips has built-in support for some common plugins and there are others
+that are aware of UltiSnips and use it to improve the user experience. This is
+an incomplete list - if you want to have your plugin listed here, just send a
+pull request.
+
+                                                    *UltiSnips-snipMate*
+
+snipMate - UltiSnips is a drop-in replacement for snipMate. It has many more
+features, so porting snippets is still a good idea, but switching has low
+friction now. UltiSnips is trying hard to truly emulate snipMate, for example
+recursive tabstops are not supported in snipMate snippets (but of course in
+UltiSnips snippets).
+
+YouCompleteMe - comes with out of the box completion support for UltiSnips. It
+offers a really nice completion dialogue for snippets.
+
+neocomplete - UltiSnips ships with a source for neocomplete and therefore
+offers out of the box completion dialogue support for it too.
+
+unite - UltiSnips has a source for unite. As an example of how you can use
+it add the following function and mappings to your vimrc: >
+
+  function! UltiSnipsCallUnite()
+    Unite -start-insert -winheight=100 -immediately -no-empty ultisnips
+    return ''
+  endfunction
+
+  inoremap <silent> <F12> <C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
+  nnoremap <silent> <F12> a<C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
+
+When typing <F12> in either insert or normal mode you will get the unite
+interface with matching snippets. Pressing enter will expand the corresponding
+snippet. If only one snippet matches the text in front of the cursor will be
+expanded when you press the <F12> key.
+
+Supertab - UltiSnips has built-in support for Supertab. Just use a recent
+enough version of both plugins and <tab> will either expand a snippet or defer
+to Supertab for expansion.
+
+5.2 Extending UltiSnips                               *UltiSnips-extending*
+-------------------------
+
+UltiSnips allows other plugins to add new snippets on the fly. Since UltiSnips
+is written in python, the integration is also on a python basis. A small
+example can be found in `test.py`, search for AddNewSnippetSource. Please
+contact us on github if you integrate UltiSnips with your plugin so it can be
+listed in the docs.
+
+=============================================================================
+6. Helping Out                                            *UltiSnips-helping*
+
+UltiSnips needs the help of the Vim community to keep improving. Please
+consider joining this effort by providing new features or bug reports.
+
+* Clone the repository on GitHub (git clone git@github.com:SirVer/ultisnips.git),
+  make your changes and send a pull request on GitHub.
+* Make a patch, report a bug/feature request (see below) and attach the patch
+  to it.
+
+You can contribute by fixing or reporting bugs in our issue tracker:
+https://github.com/sirver/ultisnips/issues
+
+=============================================================================
+7. Contributors                                      *UltiSnips-contributors*
+
+UltiSnips has been started and maintained from Jun 2009 - Dec 2015 by Holger
+Rapp (@SirVer, SirVer@gmx.de). It is now maintained by Stanislav Seletskiy
+(@seletskiy).
+
+This is the list of contributors pre-git in chronological order. For a full
+list of contributors take the union of this set and the authors according to
+git log.
+
+   JCEB - Jan Christoph Ebersbach
+   Michael Henry
+   Chris Chambers
+   Ryan Wooden
+   rupa - Rupa Deadwyler
+   Timo Schmiade
+   blueyed - Daniel Hahler
+   expelledboy - Anthony Jackson
+   allait - Alexey Bezhan
+   peacech - Charles Gunawan
+   guns - Sung Pae
+   shlomif - Shlomi Fish
+   pberndt - Phillip Berndt
+   thanatermesis-elive - Thanatermesis
+   rico-ambiescent - Rico Sta. Cruz
+   Cody Frazer
+   suy - Alejandro Exojo
+   grota - Giuseppe Rota
+   iiijjjii - Jim Karsten
+   fgalassi - Federico Galassi
+   lucapette
+   Psycojoker - Laurent Peuch
+   aschrab - Aaron Schrab
+   stardiviner - NagatoPain
+   skeept - Jorge Rodrigues
+   buztard
+   stephenmckinney - Steve McKinney
+   Pedro Algarvio - s0undt3ch
+   Eric Van Dewoestine - ervandew
+   Matt Patterson - fidothe
+   Mike Morearty - mmorearty
+   Stanislav Golovanov - JazzCore
+   David Briscoe - DavidBriscoe
+   Keith Welch - paralogiki
+   Zhao Cai - zhaocai
+   John Szakmeister - jszakmeister
+   Jonas Diemer - diemer
+   Romain Giot - rgiot
+   Sergey Alexandrov - taketwo
+   Brian Mock - saikobee
+   Gernot Höflechner - LFDM
+   Marcelo D Montu - mMontu
+   Karl Yngve Lervåg - lervag
+   Pedro Ferrari - petobens
+   Ches Martin - ches
+   Christian - Oberon00
+   Andrew Ruder - aeruder
+   Mathias Fußenegger - mfussenegger
+   Kevin Ballard - kballard
+   Ahbong Chang - cwahbong
+   Glenn Griffin - ggriffiniii
+   Michael - Pyrohh
+   Stanislav Seletskiy - seletskiy
+   Pawel Palucki - ppalucki
+   Dettorer - dettorer
+   Zhao Jiarong - kawing-chiu
+   Ye Ding - dyng
+   Greg Hurrell - wincent
+
+vim:tw=78:ts=8:ft=help:norl:
