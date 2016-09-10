@@ -1161,10 +1161,9 @@ Note: 转换有一些难以理解，所以这章被分成了两部分。第一�
 
  4.7.2 演示:                                               *UltiSnips-demos*
 
-Transformations are very powerful but often the syntax is convoluted.
-Hopefully the demos below help illustrate transformation features.
+转换是非常强大的，但是往往语法非常复杂。希望下面的演示能说明转换功能功能。
 
-Demo: Uppercase one character
+演示: 大写一个字符
 ------------------- SNIP -------------------
 snippet title "Title transformation"
 ${1:a text}
@@ -1176,7 +1175,7 @@ big small
 Big small
 
 
-Demo: Uppercase one character and global replace
+演示: 大写一个字符并全局替换
 ------------------- SNIP -------------------
 snippet title "Titlelize in the Transformation"
 ${1:a text}
@@ -1188,7 +1187,7 @@ this is a title
 This Is A Title
 
 
-Demo: ASCII transformation
+演示: ASCII转码
 ------------------- SNIP -------------------
 snippet ascii "Replace non ascii chars"
 ${1: an accentued text}
@@ -1200,9 +1199,9 @@ ascii<tab>à la pêche aux moules
 a la peche aux moules
 
 
-Demo: Regular expression grouping
-      This is a clever c-like printf snippet, the second tabstop is only shown
-      when there is a format (%) character in the first tabstop.
+演示: 正则表达式分组
+      这是一个只能的c风格的printf片段，第二个插入点只有在第一个插入点中存在格式
+      化字符(%)的时候才出现。
 
 ------------------- SNIP -------------------
 snippet printf
@@ -1217,22 +1216,21 @@ printf<tab>A is: %s<c-j>A<c-j> // End of line ->
 printf("A is: %s\n", A); // End of line
 
 
+在捆绑的片段中，还有很多使用转换的例子
 There are many more examples of what can be done with transformations in the
 bundled snippets.
 
 
-4.8 Clearing snippets                           *UltiSnips-clearing-snippets*
+4.8 清除片段                                  *UltiSnips-clearing-snippets*
 
-To remove snippets for the current file type, use the 'clearsnippets'
-directive.
+要从当前文件类型中移除片段，使用'clearsnippets'指令。
 
 ------------------- SNIP -------------------
 clearsnippets
 ------------------- SNAP -------------------
 
-'clearsnippets' removes all snippets with a priority lower than the current
-one. For example, the following cleares all snippets that have priority <= 1,
-even though the example snippet is defined after the 'clearsnippets'.
+'clearsnippets' 会移除所有优先级低于当前片段的片段。举个例子，下面的例子中会移除
+所有优先级 <= 1 的片段，尽管片段定义在'clearsnippets'之后。
 
 ------------------- SNIP -------------------
 priority 1
@@ -1244,52 +1242,50 @@ snippet example "Cleared example"
 endsnippet
 ------------------- SNAP -------------------
 
-To clear one or more specific snippet, provide the triggers of the snippets as
-arguments to the 'clearsnippets' command. The following example will clear the
-snippets 'trigger1' and 'trigger2'.
+要溢出一个或多个特定的片段，提供片段的触发器作为'clearsnippets'命令的参数，下面
+的例子就会移除触发器为'trigger1'和'trigger2'的片段。
 
 ------------------- SNIP -------------------
 clearsnippets trigger1 trigger2
 ------------------- SNAP -------------------
 
 
-4.9 Context snippets                            *UltiSnips-context-snippets*
+4.9 上下文片段                                   *UltiSnips-context-snippets*
 
-Context snippets can be enabled by using 'e' option in snippet definition.
+上下文片段可以通过在片段定义的时候使用'e'选项来定义。
 
-In that case snippet should be defined using this syntax: >
+这种情况下，片段应该使用这种语法定义: >
 
     snippet tab_trigger "description" "expression" options
 
-Context can be defined using special header using this syntax: >
+上下文可以使用这种语法使用特殊的头定义: >
 
     context "expression"
     snippet tab_trigger "description" options
 
-The 'expression' can be any python expression. If 'expression' evaluates to
-'True', then this snippet will be chosen for expansion. The 'expression' must
-be wrapped with double-quotes.
+'expression' 可以是任何python表达式。如果'expression'执行结果为'True'，那么
+表达式必须使用双引号括起来。
+If 'expression' evaluates to 'True', then this snippet will be chosen for 
+expansion.
 
-The following python modules are automatically imported into the scope before
-'expression' is evaluated: 're', 'os', 'vim', 'string', 'random'.
+下列的pytyon模块会被自动导入到'expression'执行的环境: 're', 'os', 'vim',
+'string', 'random'
 
-Global variable `snip` will be available with following properties:
-    'snip.window' - alias for 'vim.current.window'
-    'snip.buffer' - alias for 'vim.current.window.buffer'
-    'snip.cursor' - cursor object, which behaves like
-        'vim.current.window.cursor', but zero-indexed and with following
-        additional methods:
-        - 'preserve()' - special method for executing pre/post/jump actions;
-        - 'set(line, column)' - sets cursor to specified line and column;
-        - 'to_vim_cursor()' - returns 1-indexed cursor, suitable for assigning
-          to 'vim.current.window.cursor';
-    'snip.line' and 'snip.column' - aliases for cursor position (zero-indexed);
-    'snip.visual_mode' - ('v', 'V', '^V', see |visual-mode|);
-    'snip.visual_text' - last visually-selected text;
-    'snip.last_placeholder' - last active placeholder from previous snippet
-        with following properties:
-
-        - 'current_text' - text in the placeholder on the moment of selection;
+全局变量 `snip`将会提供下列属性:
+    'snip.window' - 'vim.current.window' 的别名
+    'snip.buffer' - 'vim.current.window.buffer' 的别名
+    'snip.cursor' - 光标对象，就像 'vim.current.window.cursor', 但是从0开始索引，
+        而且有下面的内容
+        其他方法：
+        - 'preserve()' - 执行前后跳跃动作的特殊方法
+        - 'set(line, column)' - 将光标设置到指定的行和列
+        - 'to_vim_cursor()' - 返回索引从1开始的光标，适合用来设定
+          'vim.current.window.cursor'
+    'snip.line' 和 'snip.column' - 光标位置的别名，从0开始索引
+    'snip.visual_mode' - ('v', 'V', '^V', 参见 |visual-mode|);
+    'snip.visual_text' - 上次选择模式选择的文本
+    'snip.last_placeholder' - 之前的片段的上一个激活的占位符，有下列特性:
+        - 'current_text' - 选中时占位符对应的文本
         - 'start' - placeholder start on the moment of selection;
         - 'end' - placeholder end on the moment of selection;
 
@@ -1301,11 +1297,10 @@ return err
 endsnippet
 ------------------- SNAP -------------------
 
-That snippet will expand to 'return err' only if the previous line is starting
-from 'if err' prefix.
+只有上一行以'if err'前缀开头，这个片段才会展开为'return err'
 
-Note: context snippets prioritized over non-context ones. It makes possible to
-use non-context snippets as fallback, if no context matched:
+Note: 上下文片段优先于非上下文片段。这使得在上下文不匹配的时候，使用非上下文片段
+作为备选成为可能
 
 ------------------- SNIP -------------------
 snippet i "if ..." b
@@ -1321,12 +1316,11 @@ if err != nil {
 endsnippet
 ------------------- SNAP -------------------
 
-That snippet will expand into 'if err != nil' if previous line will
-match 'err :=' prefix, otherwise the default 'if' snippet will be expanded.
+如果上一行匹配'err :='前缀的话，这个片段被会展开成 'if err != nil'，否则默认的
+'if'片段会被展开。
 
-It's a good idea to move context conditions to a separate module, so it can be
-used by other UltiSnips users. In that case, module should be imported
-using 'global' keyword, like this:
+将上下文条件转义到一个单独的模块是一个不错的注意，这样它就能被其他UltiSnips用户使
+用。这样，模块需要使用'global'关键字导入，就像这样: >
 
 ------------------- SNIP -------------------
 global !p
@@ -1341,15 +1335,13 @@ else:
 endsnippet
 ------------------- SNAP -------------------
 
-That snippet will expand only if the cursor is located in the return statement,
-and then it will expand either to 'err' or to 'nil' depending on which 'if'
-statement it's located. 'is_return_argument' and 'is_in_err_condition' are
-part of custom python module which is called 'my_utils' in this example.
+只要光标位于返回语句，这个片段才会被展开，然后它将会展开为'err'或'nil'，这要看
+光标处于哪一种if语句中。
+这个例子中的'is_return_argument' 和 'is_in_err_condition' 是一个叫做 'my_utiils'
+的自定义python模块的一部分。
 
-Context condition can return any value which python can use as condition in
-it's 'if' statement, and if it's considered 'True', then snippet will be
-expanded. The evaluated value of 'condition' is available in the 'snip.context'
-variable inside the snippet:
+上下文条件可以返回任何值，只要python能将它用于'if'语句，如果被认为是'True'，片段
+就会被展开。'condition' 的真值在片段内部的'snip.context'变量中可用
 
 ------------------- SNIP -------------------
 snippet + "var +=" "re.match('\s*(.*?)\s*:?=', snip.buffer[snip.line-1])" ie
@@ -1357,12 +1349,12 @@ snippet + "var +=" "re.match('\s*(.*?)\s*:?=', snip.buffer[snip.line-1])" ie
 endsnippet
 ------------------- SNAP -------------------
 
-That snippet will expand to 'var1 +=' after line, which begins from 'var1 :='.
+这个片段会被展开成 'val +='，从'val :='开始。
+(That snippet will expand to 'var1 +=' after line, which begins from 'var1 :='.)
 
                                                   *UltiSnips-capture-placeholder*
 
-You can capture placeholder text from previous snippet by using following
-trick:
+你可以从前一个片段中捕获占位符对应的文本，通过使用下面的的技巧:
 ------------------- SNIP -------------------
 snippet = "desc" "snip.last_placeholder" Ae
 `!p snip.rv = snip.context.current_text` == nil
