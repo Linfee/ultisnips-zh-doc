@@ -36,15 +36,15 @@ UltiSnips                                      *snippet* *snippets* *UltiSnips*
    4.7 转换                                     |UltiSnips-transformations|
       4.7.1 替换字符串                          |UltiSnips-replacement-string|
       4.7.2 演示                                |UltiSnips-demos|
-   4.8 Clearing snippets                        |UltiSnips-clearing-snippets|
-   4.9 Context snippets                         |UltiSnips-context-snippets|
-   4.10 Snippet actions                         |UltiSnips-snippet-actions|
+   4.8 清除片段                                 |UltiSnips-clearing-snippets|
+   4.9 上下文片段                               |UltiSnips-context-snippets|
+   4.10 片段行为                                |UltiSnips-snippet-actions|
       4.10.1 Pre-expand actions                 |UltiSnips-pre-expand-actions|
       4.10.2 Post-expand actions                |UltiSnips-post-expand-actions|
       4.10.3 Post-jump actions                  |UltiSnips-post-jump-actions|
    4.11 自动触发                                |UltiSnips-autotrigger|
 5. UltiSnips 和其他插件                         |UltiSnips-other-plugins|
-   5.1 已经集成的插                             |UltiSnips-integrations|
+   5.1 已经集成的插件                           |UltiSnips-integrations|
    5.2 扩展 UltiSnips                           |UltiSnips-extending|
 6. 帮助我们                                     |UltiSnips-helping|
 7. 贡献者                                       |UltiSnips-contributors|
@@ -605,7 +605,7 @@ a word without spaces.(这句不知道作者想说什么)
        才能被展开。有这个选项的片段会忽略触发器被放在哪。也就是说，片段可以在一
        个单词中间被触发展开。
 
-   w   单词便捷 - 使用了这个选项，只有在触发器的开始和结束处都位于单词边界，才能
+   w   单词边界 - 使用了这个选项，只有在触发器的开始和结束处都位于单词边界，才能
        被展开。也就是说触发器必须放在一个非单词字符后面。单词字符由 'iskeyword'
        设置。使用这个选项的一个例子，当触发器在一个标点符号后面，这个标点符号不是
        另一个触发器的最后字符，这个触发器可以被展开(如果这个片段使用了这个选项)。
@@ -1366,19 +1366,17 @@ other snippet (like, as in 'if ${1:var}') and will replace that tabstop by
 tabstop value following by ' == nil'.
 
 
-4.10 Snippets actions                             *UltiSnips-snippet-actions*
----------------------
+4.10 片段行为                                    *UltiSnips-snippet-actions*
+-------------
 
-Snippet actions is an arbitrary python code which can be executed at specific
-points in lifetime of the snippet.
+片段行为是一个特殊的python代码，可以在片段的生命周期的特定的点执行。
 
-There are three types of actions:
+有三种类型的片段行为:
 
-* Pre-expand - invoked just after trigger condition was matched, but before
-  snippet actually expanded;
-* Post-expand - invoked after snippet was expanded and interpolations
-  was applied for the first time, but before jump on the first placeholder.
-* Jump - invoked just after jump to the next/prev placeholder.
+* Pre-expand - 在触发器条件满足后，片段真正被展开前执行。
+* Post-expand - * 在片段被展开之后，插入内容被第一次确认，在跳到第一个插入点之前
+  执行
+* Jump - 在跳到上一个或下一个插入点之后执行
 
 Specified code will be evaluated at stages defined above and same global
 variables and modules will be available that are stated in
@@ -1540,25 +1538,21 @@ def $1():
 endsnippet
 ------------------- SNAP -------------------
 
-4.11 Autotrigger                                       *UltiSnips-autotrigger*
-----------------
+4.11 自动触发                                          *UltiSnips-autotrigger*
+-------------
 
-Note: vim should be newer than 7.4.214 to support this feature.
+Note: vim至少要有7.4.214版本才支持这个特性。
 
-Many language constructs can occur only at specific places, so it's
-possible to use snippets without manually triggering them.
+许多的语言只能出现在特定额地方，所以可以使用非手动触发的片段。
 
-Snippet can be marked as autotriggered by specifying 'A' option in the snippet
-definition.
+片段可以被标记为自动触发的，通过在定义片段的时候使用特殊的 'A' 选项。
 
-After snippet is defined as being autotriggered, snippet condition will be
-checked on every typed character and if condition matches, then snippet will
-be triggered.
+在片段被定义为自动触发后，每次键入都会检查片段条件，一旦条件满足，片段就会被触发。
 
-*Warning:* using of this feature can lead to significant vim slowdown. If you
-discovered that, report an issue to the github.com/SirVer/UltiSnips.
+*Warning:* 使用这个特性可能严重地拖慢vim的速度。如果你发现了这个问题，在这里提交
+一个issue，github.com/SirVer/UltiSnips。
 
-Consider following snippets, that can be usefull in Go programming:
+考虑下面的片段，这可能对Go语言编程是有帮助的。
 ------------------- SNIP -------------------
 snippet "^p" "package" rbA
 package ${1:main}
@@ -1576,10 +1570,10 @@ automatically expanded into "package main". Same with "m" character. There is
 no need to press trigger key after "m""
 
 ==============================================================================
-5. UltiSnips and Other Plugins                      *UltiSnips-other-plugins*
+5. UltiSnips 和其他插件                            *UltiSnips-other-plugins*
 
-5.1 Existing Integrations                            *UltiSnips-integrations*
--------------------------
+5.1 已经集成的插件                                 *UltiSnips-integrations*
+------------------
 
 UltiSnips has built-in support for some common plugins and there are others
 that are aware of UltiSnips and use it to improve the user experience. This is
@@ -1620,8 +1614,8 @@ Supertab - UltiSnips has built-in support for Supertab. Just use a recent
 enough version of both plugins and <tab> will either expand a snippet or defer
 to Supertab for expansion.
 
-5.2 Extending UltiSnips                               *UltiSnips-extending*
--------------------------
+5.2 扩展 UltiSnips                                      *UltiSnips-extending*
+------------------
 
 UltiSnips allows other plugins to add new snippets on the fly. Since UltiSnips
 is written in python, the integration is also on a python basis. A small
@@ -1630,7 +1624,7 @@ contact us on github if you integrate UltiSnips with your plugin so it can be
 listed in the docs.
 
 =============================================================================
-6. Helping Out                                            *UltiSnips-helping*
+6. 帮助我们                                              *UltiSnips-helping*
 
 UltiSnips needs the help of the Vim community to keep improving. Please
 consider joining this effort by providing new features or bug reports.
@@ -1644,11 +1638,10 @@ You can contribute by fixing or reporting bugs in our issue tracker:
 https://github.com/sirver/ultisnips/issues
 
 =============================================================================
-7. Contributors                                      *UltiSnips-contributors*
+7. 贡献者                                         *UltiSnips-contributors*
 
-UltiSnips has been started and maintained from Jun 2009 - Dec 2015 by Holger
-Rapp (@SirVer, SirVer@gmx.de). It is now maintained by Stanislav Seletskiy
-(@seletskiy).
+UltiSnips由Holger在2009年6月启动并维护到2015年12月(@SirVer SirVer@gmx.de)。它现在
+由 Stanislav Seletskiy 维护(@seletskiy)。
 
 This is the list of contributors pre-git in chronological order. For a full
 list of contributors take the union of this set and the authors according to
