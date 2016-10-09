@@ -4,10 +4,6 @@ ulti-zh-doc
 [UltiSnips](https://github.com/SirVer/ultisnips)是我非常喜欢的vim插件之一，
 它真的非常强大，而且非常流畅。
 
-我希望更多人能够方便的使用UltiSnips，于是我做了这个汉化版的UltiSnips文档。翻译尚
-未完成，这只是半成品，而且目前翻译的比较粗糙，我会首先完成翻译，然后做一些语义上
-的优化，不至于读起来感觉很怪异。
-
 __注意__: 这仅仅只UltiSnips的文档的翻译，到[这里](https://github.com/SirVer/ultisnips)
 获取UltiSnips插件的相关信息
 
