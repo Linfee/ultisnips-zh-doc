@@ -1354,7 +1354,7 @@ endsnippet
 
                                                   *UltiSnips-capture-placeholder*
 
-你可以从前一个片段中捕获占位符对应的文本，通过使用下面的的技巧:
+通过使用下面的的技巧，你可以从前一个片段中捕获占位符对应的文本:
 ------------------- SNIP -------------------
 snippet = "desc" "snip.last_placeholder" Ae
 `!p snip.rv = snip.context.current_text` == nil
@@ -1391,7 +1391,7 @@ actions.
 
 'snip.buffer' has the same interface as 'vim.current.window.buffer'.
 
-4.10.1 Pre-expand actions                       *UltiSnips-pre-expand-actions*
+4.10.1 Pre-expand 行为                       *UltiSnips-pre-expand-actions*
 
 Pre-expand actions can be used to match snippet in one location and then
 expand it in the different location. Some useful cases are: correcting
@@ -1438,7 +1438,7 @@ def $1():
 endsnippet
 ------------------- SNAP -------------------
 
-4.10.2 Post-expand actions                     *UltiSnips-post-expand-actions*
+4.10.2 Post-expand 行为                     *UltiSnips-post-expand-actions*
 
 Post-expand actions can be used to perform some actions based on the expanded
 snippet text. Some cases are: code style formatting (e.g. inserting newlines
@@ -1473,7 +1473,7 @@ def $1():
 endsnippet
 ------------------- SNAP -------------------
 
-4.10.3 Post-jump actions                         *UltiSnips-post-jump-actions*
+4.10.3 Post-jump 行为                         *UltiSnips-post-jump-actions*
 
 Post-jump actions can be used to trigger some code based on user input into
 the placeholders. Notable use cases: expand another snippet after jump or
@@ -1565,9 +1565,8 @@ func main() {
 endsnippet
 ------------------- SNAP -------------------
 
-When "p" character will occur in the beginning of the line, it will be
-automatically expanded into "package main". Same with "m" character. There is
-no need to press trigger key after "m""
+当 "p" 字符出现在一行的开始，它将会自动展开成 "package main"。"m" 字符也一样，不
+需要手动在 "m" 之后按触发键。
 
 ==============================================================================
 5. UltiSnips 和其他插件                            *UltiSnips-other-plugins*
@@ -1575,27 +1574,25 @@ no need to press trigger key after "m""
 5.1 已经集成的插件                                 *UltiSnips-integrations*
 ------------------
 
-UltiSnips has built-in support for some common plugins and there are others
-that are aware of UltiSnips and use it to improve the user experience. This is
-an incomplete list - if you want to have your plugin listed here, just send a
-pull request.
+UltiSnips已经内置支持了一些通用的插件，还有一些其他的插件意识到了UltiSnips，并使
+用它来提升用户体验。这是一个不完整的列表，如果你希望你的插件在这里列出，只需要发
+送一个 pull request。
 
                                                     *UltiSnips-snipMate*
 
-snipMate - UltiSnips is a drop-in replacement for snipMate. It has many more
-features, so porting snippets is still a good idea, but switching has low
-friction now. UltiSnips is trying hard to truly emulate snipMate, for example
-recursive tabstops are not supported in snipMate snippets (but of course in
-UltiSnips snippets).
+snipMate - UltiSnips是snipMate的替代品，并兼容snipMate。它有着更多的特性，所以移
+植snippet片段任然是一个好主意。但是切换并不是完全无痛的。UltiSnips正在努力真正
+的兼容snipMate，比如，递归的插入点在 snipMate 中是不受支持的(但是在UltiSnips中当
+然要支持)。
 
-YouCompleteMe - comes with out of the box completion support for UltiSnips. It
-offers a really nice completion dialogue for snippets.
+YouCompleteMe - 为 UltiSnips 提供开箱即用的支持，它为snippet片段提供了一个非常好
+的补全对话框
 
-neocomplete - UltiSnips ships with a source for neocomplete and therefore
-offers out of the box completion dialogue support for it too.
+neocomplete - UltiSnips 使用了 neocomplete 的一部分源码，因此提供开箱即用的补全
+对话框支持
 
-unite - UltiSnips has a source for unite. As an example of how you can use
-it add the following function and mappings to your vimrc: >
+unite - UltiSnips使用了unite的部分源码。例如你可以这样使用它，把下面的方法和映射
+添加到你的 vimrc: >
 
   function! UltiSnipsCallUnite()
     Unite -start-insert -winheight=100 -immediately -no-empty ultisnips
@@ -1605,36 +1602,31 @@ it add the following function and mappings to your vimrc: >
   inoremap <silent> <F12> <C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
   nnoremap <silent> <F12> a<C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
 
-When typing <F12> in either insert or normal mode you will get the unite
-interface with matching snippets. Pressing enter will expand the corresponding
-snippet. If only one snippet matches the text in front of the cursor will be
-expanded when you press the <F12> key.
+不论是插入不是还是普通模式，当你按下 <F12> 你将会打开一个unite界面，里面是匹配的
+snippet片段。按下回车键将会展开响应的snippet片段。如果只有一个片段匹配光标前的
+文本，片段将会在你按下 <f12> 的时候就展开。
 
-Supertab - UltiSnips has built-in support for Supertab. Just use a recent
-enough version of both plugins and <tab> will either expand a snippet or defer
-to Supertab for expansion.
+Supertab - UltiSnips内置了对Supertab的支持。只需要使用两个插件的足够新的版本，使
+用 <tab> 将既能展开一个snippet片段，也能按照 Supertab 的定义工作。
 
 5.2 扩展 UltiSnips                                      *UltiSnips-extending*
 ------------------
 
-UltiSnips allows other plugins to add new snippets on the fly. Since UltiSnips
-is written in python, the integration is also on a python basis. A small
-example can be found in `test.py`, search for AddNewSnippetSource. Please
-contact us on github if you integrate UltiSnips with your plugin so it can be
-listed in the docs.
+UltiSnips允许其他插件动态添加snippet片段。因为UltiSnips由python开发，所以整合也是
+基于python的。可以在 `test.py` 找到一个小例子，搜索 AddNewSnippetSource。如果你
+将UltiSnips和你的插件做了整合，请在github上联系我们，以便我们将其加入到文档中。
 
 =============================================================================
 6. 帮助我们                                              *UltiSnips-helping*
 
-UltiSnips needs the help of the Vim community to keep improving. Please
-consider joining this effort by providing new features or bug reports.
+UltiSnips 需要vim社区的帮助来持续改进。请考虑加入我们的工作，通过提供新的特性或
+提交bug报告。
 
-* Clone the repository on GitHub (git clone git@github.com:SirVer/ultisnips.git),
-  make your changes and send a pull request on GitHub.
-* Make a patch, report a bug/feature request (see below) and attach the patch
-  to it.
+* 在 GitHub 上克隆这个仓库 (git clone * git@github.com:SirVer/ultisnips.git)，做
+  出你自己的修改并在 GitHub 上提交一个 pull request。
+* 制作一个补丁，提交一个bug请求(request)或特性请求(request) (如下) 并附上这个补丁
 
-You can contribute by fixing or reporting bugs in our issue tracker:
+你可以通过在我们的 issue tracker 上提交bug或修复bug来做出贡献:
 https://github.com/sirver/ultisnips/issues
 
 =============================================================================
