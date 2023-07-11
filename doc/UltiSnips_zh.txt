@@ -593,8 +593,8 @@ Generally a single word is used but the tab_trigger can include spaces
                                                   *UltiSnips-snippet-options*
 
 'options' 则控制着片段的行为。'options' 通过单个字符指定。
-The 'options' characters for a snippet are combined into
-a word without spaces.(这句不知道作者想说什么)
+片段的'options'选项如果有多个当做一个单词连起来写即可，不需要加空格。
+
 
 目前支持下面的options(选项)： >
    b   一行的开始 - 有这个选项的片段只有在触发器是一行的第一个单词(如果触发器是多
